@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import contextlib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -110,6 +111,21 @@ async def init_db(db: aiosqlite.Connection) -> None:
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
 
+        CREATE TABLE IF NOT EXISTS users (
+          user_id INTEGER PRIMARY KEY,
+          chat_id INTEGER NOT NULL,
+          username TEXT,
+          first_name TEXT,
+          last_name TEXT,
+          language_code TEXT,
+          is_premium BOOLEAN DEFAULT 0,
+          is_bot BOOLEAN DEFAULT 0,
+          bio TEXT,
+          photo_file_id TEXT,
+          first_seen_at INTEGER NOT NULL,
+          last_seen_at INTEGER NOT NULL
+        );
+
         CREATE TABLE IF NOT EXISTS bot_sessions (
           chat_id INTEGER NOT NULL,
           user_id INTEGER NOT NULL,
@@ -122,6 +138,8 @@ async def init_db(db: aiosqlite.Connection) -> None:
         """
     )
     await db.execute("INSERT OR IGNORE INTO stats (id) VALUES (1)")
+    with contextlib.suppress(aiosqlite.OperationalError):
+        await db.execute("ALTER TABLE users ADD COLUMN usage_count INTEGER DEFAULT 0")
 
     for idx, url in enumerate(DEFAULT_SOURCES, start=1):
         await db.execute(
@@ -189,6 +207,73 @@ async def upsert_server(db: aiosqlite.Connection, server: dict[str, Any]) -> Non
             1 if server.get("is_selected") else 0,
         ),
     )
+
+
+async def upsert_user(db: aiosqlite.Connection, user: dict[str, Any]) -> None:
+    await db.execute(
+        """
+        INSERT INTO users (
+          user_id, chat_id, username, first_name, last_name, language_code, is_premium,
+          is_bot, bio, photo_file_id, first_seen_at, last_seen_at, usage_count
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(user_id) DO UPDATE SET
+          chat_id = excluded.chat_id,
+          username = excluded.username,
+          first_name = excluded.first_name,
+          last_name = excluded.last_name,
+          language_code = excluded.language_code,
+          is_premium = excluded.is_premium,
+          is_bot = excluded.is_bot,
+          bio = COALESCE(excluded.bio, users.bio),
+          photo_file_id = COALESCE(excluded.photo_file_id, users.photo_file_id),
+          last_seen_at = excluded.last_seen_at,
+          usage_count = users.usage_count + 1
+        """,
+        (
+            int(user["user_id"]),
+            int(user["chat_id"]),
+            user.get("username"),
+            user.get("first_name"),
+            user.get("last_name"),
+            user.get("language_code"),
+            1 if user.get("is_premium") else 0,
+            1 if user.get("is_bot") else 0,
+            user.get("bio"),
+            user.get("photo_file_id"),
+            int(user["first_seen_at"]),
+            int(user["last_seen_at"]),
+            1,
+        ),
+    )
+    await db.commit()
+
+
+async def count_users_since(db: aiosqlite.Connection, *, since_ts: int) -> int:
+    row = await fetchone(
+        db,
+        "SELECT COUNT(*) as cnt FROM users WHERE last_seen_at >= ?",
+        (int(since_ts),),
+    )
+    return int(row["cnt"] if row else 0)
+
+
+async def count_users_total(db: aiosqlite.Connection) -> int:
+    row = await fetchone(db, "SELECT COUNT(*) as cnt FROM users")
+    return int(row["cnt"] if row else 0)
+
+
+async def list_users(db: aiosqlite.Connection) -> list[dict[str, Any]]:
+    rows = await fetchall(
+        db,
+        """
+        SELECT user_id, chat_id, username, first_name, last_name, language_code,
+               is_premium, is_bot, bio, photo_file_id, first_seen_at, last_seen_at,
+               usage_count
+        FROM users
+        ORDER BY last_seen_at DESC
+        """,
+    )
+    return [dict(r) for r in rows]
 
 
 async def count_selected_active(db: aiosqlite.Connection) -> int:

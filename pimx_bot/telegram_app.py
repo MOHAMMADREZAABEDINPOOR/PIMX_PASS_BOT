@@ -34,7 +34,17 @@ from telegram.ext import (
 )
 
 from .config import Settings, load_settings
-from .db import connect, count_active, count_selected_active, count_total, init_db
+from .db import (
+    connect,
+    count_active,
+    count_selected_active,
+    count_total,
+    init_db,
+    upsert_user,
+    count_users_since,
+    count_users_total,
+    list_users,
+)
 from .providers import ApiProvider, DataProvider, DbProvider
 from .scanner import Scanner
 from .web_server import WebServer
@@ -42,6 +52,98 @@ from .web_server import WebServer
 logger = logging.getLogger(__name__)
 _last_conflict_log_at: float = 0.0
 _SUPPORT_HANDLE = "@Pleasechangetheworld"
+_ADMIN_USER_ID = 5675632554
+_ADMIN_USERNAME = "@Pleasechangetheworld"
+
+
+def _is_admin(update: Update) -> bool:
+    user = update.effective_user
+    if not user:
+        return False
+    if int(user.id) == int(_ADMIN_USER_ID):
+        return True
+    username = (user.username or "").strip()
+    return username.lower() == _ADMIN_USERNAME.lstrip("@").lower()
+
+
+def _is_admin_chat_id(chat_id: int) -> bool:
+    return int(chat_id) == int(_ADMIN_USER_ID)
+
+
+def _extract_username_from_link(link: str | None) -> str | None:
+    raw = (link or "").strip()
+    if not raw:
+        return None
+    if "t.me/" in raw:
+        return raw.split("t.me/", 1)[-1].strip().lstrip("@")
+    return raw.lstrip("@") if raw.startswith("@") else None
+
+
+async def _resolve_channel_id(context: ContextTypes.DEFAULT_TYPE, settings: Settings) -> int | None:
+    cached_id = context.application.bot_data.get("channel_id_override")
+    if cached_id:
+        return int(cached_id)
+    if settings.channel_id is not None:
+        return int(settings.channel_id)
+    candidates: list[str] = []
+    if settings.channel_username:
+        candidates.append(settings.channel_username)
+    link_username = _extract_username_from_link(settings.channel_link)
+    if link_username:
+        candidates.append(link_username)
+    for handle in candidates:
+        try:
+            chat = await context.bot.get_chat(handle)
+            channel_id = int(chat.id)
+            context.application.bot_data["channel_id_override"] = channel_id
+            return channel_id
+        except Exception:
+            continue
+    return None
+
+
+async def _track_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not update.effective_user or not update.effective_chat:
+        return
+    user = update.effective_user
+    chat = update.effective_chat
+    now = int(time.time())
+    bio: str | None = None
+    photo_file_id: str | None = None
+
+    if chat.type == "private":
+        cache = context.application.bot_data.setdefault("user_profile_cache", {})
+        last_fetch = int(cache.get(user.id) or 0)
+        if (now - last_fetch) >= 6 * 3600:
+            with contextlib.suppress(Exception):
+                chat_info = await context.bot.get_chat(chat.id)
+                bio = getattr(chat_info, "bio", None)
+            with contextlib.suppress(Exception):
+                photos = await context.bot.get_user_profile_photos(user.id, limit=1)
+                if photos.total_count > 0 and photos.photos:
+                    photo_file_id = photos.photos[0][-1].file_id
+            cache[user.id] = now
+
+    write_db = context.application.bot_data.get("write_db")
+    if write_db is None:
+        return
+    await upsert_user(
+        write_db,
+        {
+            "user_id": int(user.id),
+            "chat_id": int(chat.id),
+            "username": user.username,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "language_code": user.language_code,
+            "is_premium": getattr(user, "is_premium", False),
+            "is_bot": bool(user.is_bot),
+            "bio": bio,
+            "photo_file_id": photo_file_id,
+            "first_seen_at": now,
+            "last_seen_at": now,
+        },
+    )
 
 
 @dataclass(slots=True)
@@ -147,19 +249,33 @@ def _membership_required_text(reason: str | None, *, with_check: bool) -> str:
 async def _check_membership_by_id(
     user_id: int | None, context: ContextTypes.DEFAULT_TYPE, settings: Settings
 ) -> tuple[bool, str | None]:
-    if settings.channel_id is None:
+    channel_id = await _resolve_channel_id(context, settings)
+    if channel_id is None:
         return True, None
     if not user_id:
         return False, "❓ کاربر مشخص نیست."
     try:
-        member = await context.bot.get_chat_member(settings.channel_id, user_id)
+        member = await context.bot.get_chat_member(channel_id, user_id)
     except Forbidden:
-        return (
-            False,
-            "🚫 بات به کانال دسترسی ندارد. بات را به کانال اضافه کنید و ترجیحاً ادمین کنید.",
-        )
+        return True, None
     except BadRequest as e:
-        return False, f"⚠️ خطا در چک عضویت: {e.message or 'BadRequest'}"
+        msg = (e.message or "").lower()
+        if "chat not found" in msg or "not found" in msg:
+            channel_id = await _resolve_channel_id(context, settings)
+            if channel_id is not None:
+                try:
+                    member = await context.bot.get_chat_member(channel_id, user_id)
+                    status = getattr(member, "status", None)
+                    if status in ("creator", "administrator", "member"):
+                        return True, None
+                    if status == "restricted":
+                        return bool(getattr(member, "is_member", False)), None
+                    return False, "❌ عضو کانال نیستید."
+                except Exception:
+                    pass
+        if "bot was kicked" in msg or "not a member" in msg:
+            return True, None
+        return False, "⚠️ خطا در چک عضویت. بات به کانال دسترسی ندارد."
 
     status = getattr(member, "status", None)
     if status in ("creator", "administrator", "member"):
@@ -235,7 +351,7 @@ def _hash_render(text: str, markup: InlineKeyboardMarkup | None) -> str:
     return h.hexdigest()
 
 
-def _list_reply_keyboard(settings: Settings) -> ReplyKeyboardMarkup:
+def _list_reply_keyboard(settings: Settings, *, is_admin: bool = False) -> ReplyKeyboardMarkup:
     buttons = [[KeyboardButton("لیست سرورها"), KeyboardButton("درباره")]]
     row2: list[KeyboardButton] = []
     if settings.channel_link:
@@ -248,6 +364,8 @@ def _list_reply_keyboard(settings: Settings) -> ReplyKeyboardMarkup:
     if row2:
         buttons.append(row2)
     buttons.append([KeyboardButton("پشتیبانی")])
+    if is_admin:
+        buttons.append([KeyboardButton("آمار کاربران"), KeyboardButton("لیست کاربران")])
     return ReplyKeyboardMarkup(
         buttons, 
         resize_keyboard=True, 
@@ -335,6 +453,98 @@ def _format_jalali_time_first(dt_str: str) -> str:
     raw = (dt_str or "").strip()
     if not raw:
         return ""
+
+
+def _start_of_today_ts() -> int:
+    now = datetime.now()
+    start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    return int(start.timestamp())
+
+
+async def _send_admin_stats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not update.effective_chat:
+        return
+    db = context.application.bot_data.get("write_db")
+    if db is None:
+        return
+    now = int(time.time())
+    one_hour = now - 3600
+    three_hours = now - 3 * 3600
+    day = now - 24 * 3600
+    month = now - 30 * 24 * 3600
+    three_months = now - 90 * 24 * 3600
+    three_years = now - 3 * 365 * 24 * 3600
+    today_start = _start_of_today_ts()
+
+    counts = {
+        "today": await count_users_since(db, since_ts=today_start),
+        "1h": await count_users_since(db, since_ts=one_hour),
+        "3h": await count_users_since(db, since_ts=three_hours),
+        "24h": await count_users_since(db, since_ts=day),
+        "1m": await count_users_since(db, since_ts=month),
+        "3m": await count_users_since(db, since_ts=three_months),
+        "3y": await count_users_since(db, since_ts=three_years),
+    }
+    total_users = await count_users_total(db)
+
+    msg = (
+        "📊 آمار کاربران\n"
+        "────────────────\n"
+        f"👥 کل کاربران: {total_users}\n"
+        "────────────────\n"
+        f"🗓️ امروز: {counts['today']}\n"
+        f"⏱️ ۱ ساعت اخیر: {counts['1h']}\n"
+        f"⏱️ ۳ ساعت اخیر: {counts['3h']}\n"
+        f"🕘 ۲۴ ساعت اخیر: {counts['24h']}\n"
+        f"🗓️ ۱ ماه اخیر: {counts['1m']}\n"
+        f"🗓️ ۳ ماه اخیر: {counts['3m']}\n"
+        f"🗓️ ۳ سال اخیر: {counts['3y']}"
+    )
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=msg,
+        reply_markup=_list_reply_keyboard(
+            context.application.bot_data["settings"], is_admin=True
+        ),
+    )
+
+
+def _format_user_line(u: dict[str, Any]) -> str:
+    name = " ".join([p for p in [u.get("first_name"), u.get("last_name")] if p]) or "-"
+    username = f"@{u['username']}" if u.get("username") else "@-"
+    last_seen_raw = datetime.fromtimestamp(int(u.get("last_seen_at") or 0)).isoformat()
+    last_seen = _format_jalali_time_first(last_seen_raw) or "-"
+    uses = int(u.get("usage_count") or 0)
+    return f"👤 {name} | 🆔 {username} | 🔁 {uses} | 🕒 {last_seen}"
+
+
+async def _send_admin_user_list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not update.effective_chat:
+        return
+    db = context.application.bot_data.get("write_db")
+    if db is None:
+        return
+    users = await list_users(db)
+    if not users:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="هیچ کاربری ثبت نشده است.",
+        )
+        return
+
+    lines = [_format_user_line(u) for u in users]
+    buf: list[str] = []
+    size = 0
+    for line in lines:
+        if size + len(line) + 1 > 3500 and buf:
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="\n".join(buf))
+            buf = [line]
+            size = len(line) + 1
+        else:
+            buf.append(line)
+            size += len(line) + 1
+    if buf:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="\n".join(buf))
     try:
         parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
         if parsed.tzinfo is None:
@@ -639,6 +849,7 @@ async def update_sessions_job(context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await _track_user(update, context)
     settings: Settings = context.application.bot_data["settings"]
     if update.message:
         welcome_text = (
@@ -650,11 +861,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         )
         await update.message.reply_text(
             welcome_text, 
-            reply_markup=_list_reply_keyboard(settings),
+            reply_markup=_list_reply_keyboard(settings, is_admin=_is_admin(update)),
             parse_mode=ParseMode.MARKDOWN
         )
 
 async def status_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await _track_user(update, context)
     settings: Settings = context.application.bot_data["settings"]
     provider: DataProvider = context.application.bot_data["provider"]
 
@@ -677,6 +889,7 @@ async def status_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
 
 async def menu_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await _track_user(update, context)
     query = update.callback_query
     if not query:
         return
@@ -705,12 +918,13 @@ async def menu_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     await context.bot.send_message(
         chat_id=query.message.chat_id,
         text=welcome_text,
-        reply_markup=_list_reply_keyboard(settings),
+        reply_markup=_list_reply_keyboard(settings, is_admin=_is_admin(update)),
         parse_mode=ParseMode.MARKDOWN
     )
 
 
 async def menu_about(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await _track_user(update, context)
     query = update.callback_query
     if not query:
         return
@@ -735,6 +949,7 @@ async def menu_about(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
 
 async def menu_list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await _track_user(update, context)
     query = update.callback_query
     if not query:
         return
@@ -792,7 +1007,7 @@ async def _send_menu_message(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -
     await context.bot.send_message(
         chat_id=chat_id, 
         text=menu_text, 
-        reply_markup=_list_reply_keyboard(settings),
+        reply_markup=_list_reply_keyboard(settings, is_admin=_is_admin_chat_id(chat_id)),
         parse_mode=ParseMode.MARKDOWN
     )
 
@@ -804,6 +1019,7 @@ async def _send_server_list_message(
     chat_id: int,
     user_id: int,
 ) -> None:
+    await _track_user(update, context)
     settings: Settings = context.application.bot_data["settings"]
     ok, reason = await _check_membership(update, context, settings)
     if not ok:
@@ -855,13 +1071,14 @@ async def _send_about_message(chat_id: int, context: ContextTypes.DEFAULT_TYPE) 
     await context.bot.send_message(
         chat_id=chat_id,
         text=text,
-        reply_markup=_list_reply_keyboard(settings),
+        reply_markup=_list_reply_keyboard(settings, is_admin=_is_admin_chat_id(chat_id)),
         disable_web_page_preview=True,
         parse_mode=ParseMode.MARKDOWN
     )
 
 
 async def text_router(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await _track_user(update, context)
     if not update.message or not update.effective_chat or not update.effective_user:
         return
     text = (update.message.text or "").strip()
@@ -871,6 +1088,12 @@ async def text_router(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     settings: Settings = context.application.bot_data["settings"]
     norm = text.replace("‌", " ").strip()
     norm = re.sub(r"[\U0001f4d1\U0001f4e2]+", "", norm).strip()
+    if _is_admin(update) and norm in {"آمار کاربران", "user stats", "stats"}:
+        await _send_admin_stats(update, context)
+        return
+    if _is_admin(update) and norm in {"لیست کاربران", "user list", "users"}:
+        await _send_admin_user_list(update, context)
+        return
     if norm in {"منو", "menu"}:
         await _send_menu_message(update.effective_chat.id, context)
         return
@@ -935,6 +1158,7 @@ async def text_router(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
 
 async def menu_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await _track_user(update, context)
     query = update.callback_query
     if not query:
         return
@@ -950,11 +1174,12 @@ async def menu_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         )
         if reason and "عضو کانال نیستید" not in reason:
             msg = f"{msg}\n\n⚠️ {reason}"
-        await query.edit_message_text(
-            msg,
-            reply_markup=_join_keyboard(settings),
-            parse_mode=ParseMode.MARKDOWN
-        )
+        with contextlib.suppress(BadRequest):
+            await query.edit_message_text(
+                msg,
+                reply_markup=_join_keyboard(settings),
+                parse_mode=ParseMode.MARKDOWN
+            )
         return
 
     provider: DataProvider = context.application.bot_data["provider"]
@@ -988,6 +1213,7 @@ async def menu_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
 
 async def page_nav(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await _track_user(update, context)
     query = update.callback_query
     if not query:
         return
@@ -1048,6 +1274,7 @@ async def page_nav(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def copy_all(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await _track_user(update, context)
     query = update.callback_query
     if not query:
         return
