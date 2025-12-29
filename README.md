@@ -1,38 +1,38 @@
-# PIMX_PASS_BOT — ربات مدیریت و نمایش سرورها (Telegram)
+# PIMX_PASS_BOT — Server Scanning & Display Bot (Telegram)
 
-**رباتی برای اسکن، تست و نمایش کانفیگ سرورها در تلگرام — خودکار، ساده و امن**
+**An automated, simple, and secure Telegram bot for scanning, testing, and presenting server configurations.**
 
-Live Demo / Web UI: محلی (در صورت راه‌اندازی)
+Web UI / Live Demo: local (if configured)
 
-✨ ویژگی‌های اصلی
+✨ Key Features
 
-🔎 اسکن و تست خودکار سرورها
-- زمان‌بندی تست‌ها (مثلاً هر ساعت) با پشتیبانی از اجرای موازی
-- ثبت نتایج تست در SQLite و نمایش وضعیت تست به‌ صورت به‌هنگام
-- گزارش دقیق زمان‌بندی‌شده و لاگ تست‌ها برای دیباگ و پیگیری
+🔎 Automated Scanning & Testing
+- Scheduled tests (e.g., hourly) with optional concurrent execution
+- Results stored in SQLite with live test status updates
+- Detailed logs and reports for debugging and audit
 
-📩 تعامل با تلگرام
-- نمایش لیست سرورها به‌صورت صفحه‌بندی (۱۰ تا ۱۰ تا)
-- دکمه‌های قبلی/بعدی، جستجوی سرور و گزینه به‌روزرسانی/تست دستی
-- نمایش وضعیت تست و درصد پیشرفت با ویرایش پیام (message edits)
-- الزام عضویت کاربران در کانال برای دسترسی به لیست (کانال-پرانگ)
+📩 Telegram Interaction
+- Paginated server lists (10 items per page)
+- Previous/Next navigation, server search, and manual test/update buttons
+- Live progress/status updates via message edits
+- Optional channel membership enforcement for access control
 
-🗄️ ذخیره‌سازی و پیکربندی
-- دیتابیس SQLite برای ذخیره سرورها و نتایج تست (`data/*.db`)
-- پیکربندی از طریق فایل `.env` (توکن بات، روش Provider و غیره)
-- امکان تنظیم Provider داده (DB یا فایل/سرویس دیگر)
+🗄️ Storage & Configuration
+- SQLite database for servers and test results (`data/*.db`)
+- Configuration via `.env` (bot token, provider settings, etc.)
+- Pluggable data providers (DB or external services)
 
-🌐 رابط وب سبک
-- صفحه وب ساده برای مشاهده کانفیگ‌ها و تولید لینک قابل‌کپی
-- مناسب برای اشتراک‌گذاری کانفیگ‌ها بدون ارسال متن طولانی در چت
+🌐 Lightweight Web UI
+- Simple web interface for viewing configurations and generating copyable links
+- Useful for sharing long configs without pasting text into chat
 
-🔒 امنیت و نکات عملی
-- **توکن‌ها (Bot token, PAT) را هرگز در ریپو نگهداری نکنید.** از `.env` و `.gitignore` استفاده کنید.
-- اگر توکن یا اطلاعات حساس به‌طور ناخواسته منتشر شد، فوراً آن را بازنشانی (reset/revoke) کنید.
+🔒 Security Notes
+- **Never store tokens (bot tokens, PATs) inside the repo.** Use `.env` and keep secrets out of source control.
+- If any sensitive value is leaked, revoke/reset it immediately.
 
-🚀 راه‌اندازی سریع
+🚀 Quick Start
 
-1) محیط مجازی و نصب وابستگی‌ها:
+1) Create and activate virtual environment:
 
 ```powershell
 python -m venv .venv
@@ -40,22 +40,23 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-2) پیکربندی محیط (`.env`):
+2) Configure environment (`.env`):
+
 - `TELEGRAM_TOKEN=your_bot_token_here`
 - `DATA_PROVIDER=db`
 - `DATABASE_PATH=data/pimx.db`
 - `WEB_PORT=8080`
-- `PUBLIC_BASE_URL=https://your.domain` (در صورت نیاز)
+- `PUBLIC_BASE_URL=https://your.domain` (if needed)
 
-3) اجرای برنامه:
+3) Run the application:
 
 ```powershell
 python main.py
 ```
 
-یا برای اجرا به‌عنوان سرویس، از سیستم قطعه‌بندی مثل `systemd` یا Docker استفاده کنید.
+For production use, run the service with systemd, Docker, or a process manager.
 
-🧰 فایل‌ها و ساختار پروژه
+🧰 Project Structure
 
 ```
 PIMX_PASS_BOT/
@@ -63,8 +64,8 @@ PIMX_PASS_BOT/
 ├── requirements.txt
 ├── .env.example
 ├── README.md
-├── scripts/                # اسکریپت‌های کمکی (مثل push_to_github.ps1)
-├── data/                   # دیتابیس‌ها و داده‌های محلی
+├── scripts/                # helper scripts (e.g. push_to_github.ps1)
+├── data/                   # local databases and data files
 └── pimx_bot/
     ├── config.py
     ├── db.py
@@ -74,20 +75,20 @@ PIMX_PASS_BOT/
     └── web_server.py
 ```
 
-🛠️ عیوب و رفع اشکال (Troubleshooting)
-- موقعیت سرور یافت نشد: بررسی کنید آدرس/پورت صحیح است و فایروال دسترسی را مسدود نکرده باشد.
-- تست‌ها اجرا نمی‌شوند: بررسی لاگ‌ها (`.log`) و دیتابیس برای خطاها و پیام‌های استثنایی.
-- بات پیام ارسال نمی‌کند: بررسی توکن، اتصال به اینترنت و محدودیت‌های API تلگرام.
+🛠 Troubleshooting
+- Location or server not found: verify host/port and firewall settings.
+- Tests are not running: check logs (`.log`) and database for errors and exceptions.
+- Bot does not send messages: verify token, network connectivity, and Telegram API limits.
 
-🤝 مشارکت (Contributing)
-- باگ گزارش دهید یا پیشنهاد ویژگی بدهید (Issues)
-- درخواست Pull Request با یک توصیف کامل و تست‌های لازم ارسال کنید
+🤝 Contributing
+- Report issues or feature requests via GitHub Issues
+- Fork the repo, create a feature branch, and send a Pull Request with a clear description and tests if applicable
 
-📄 مجوز
-- این پروژه تحت **MIT License** منتشر شده است — آزاد برای استفاده و تغییر.
+📄 License
+- This project is released under the **MIT License** — free to use, modify and distribute.
 
-👤 نویسنده
-Mohammadreza Abedinpour  — https://github.com/MOHAMMADREZAABEDINPOOR
+👤 Author
+Mohammadreza Abedinpour — https://github.com/MOHAMMADREZAABEDINPOOR
 
 Last updated: 2025
 
