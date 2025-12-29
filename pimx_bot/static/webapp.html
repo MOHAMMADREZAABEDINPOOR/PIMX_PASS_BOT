@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PIMX Mini App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1223;
+      --card: rgba(255, 255, 255, 0.06);
+      --card-strong: rgba(255, 255, 255, 0.12);
+      --accent: #6ef3c5;
+      --accent-2: #5aa8ff;
+      --text: #e8ecf5;
+      --muted: #95a0c0;
+      --danger: #ff7b7b;
+      --radius: 14px;
+      --shadow: 0 10px 50px rgba(0, 0, 0, 0.35);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Space Grotesk", "Manrope", system-ui, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at 10% 20%, rgba(98, 84, 255, 0.12), transparent 25%),
+                  radial-gradient(circle at 80% 0%, rgba(110, 243, 197, 0.18), transparent 26%),
+                  var(--bg);
+      min-height: 100vh;
+      padding: 18px;
+      line-height: 1.55;
+    }
+    .shell {
+      max-width: 960px;
+      margin: 0 auto 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .panel {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(4px);
+    }
+    header.hero {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .eyebrow {
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 12px;
+      color: var(--accent);
+      margin: 0 0 6px;
+      font-weight: 700;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 30px);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .hero .sub {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .stat {
+      background: var(--card-strong);
+      border-radius: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .stat label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .stat .value {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .progress {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .progress span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    button {
+      border: none;
+      cursor: pointer;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 14px;
+      color: #0a0f1f;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+      box-shadow: 0 10px 40px rgba(110, 243, 197, 0.2);
+    }
+    button.secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: none;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    button:not(:disabled):active {
+      transform: translateY(1px);
+    }
+    .list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: var(--radius);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: var(--shadow);
+    }
+    .card .title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .card .title .flag {
+      font-size: 18px;
+    }
+    .meta {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .pill {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .pill.good { color: var(--accent); border-color: rgba(110, 243, 197, 0.5); }
+    .pill.bad { color: var(--danger); border-color: rgba(255, 123, 123, 0.6); }
+    .code {
+      background: #0f1c35;
+      border-radius: 12px;
+      padding: 10px;
+      font-family: "Space Grotesk", monospace;
+      font-size: 12px;
+      color: #dfe8ff;
+      word-break: break-all;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .card .actions {
+      justify-content: space-between;
+      align-items: center;
+    }
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .pagination .info {
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .empty, .error {
+      padding: 16px;
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      color: var(--muted);
+      text-align: center;
+    }
+    .toast {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(11, 18, 35, 0.9);
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      pointer-events: none;
+      font-weight: 600;
+      z-index: 5;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, -4px);
+    }
+    .about {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .badge {
+      padding: 4px 8px;
+      border-radius: 10px;
+      background: rgba(110, 243, 197, 0.12);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+    }
+    @media (max-width: 640px) {
+      body { padding: 14px; }
+      .card { padding: 12px; }
+      .panel { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="hero panel">
+      <div>
+        <p class="eyebrow">PIMX Mini App</p>
+        <h1>Live server board <span class="badge">beta</span></h1>
+        <p class="sub">Same sources as the bot, packed in a Telegram WebApp for quick copying.</p>
+      </div>
+      <div class="status-grid" id="status-grid">
+        <div class="stat">
+          <label>Scan</label>
+          <div class="value" id="stat-scan">—</div>
+          <div class="progress"><span id="progress-bar"></span></div>
+        </div>
+        <div class="stat">
+          <label>Tested / Total</label>
+          <div class="value" id="stat-tested">—</div>
+        </div>
+        <div class="stat">
+          <label>Active found</label>
+          <div class="value" id="stat-active">—</div>
+        </div>
+        <div class="stat">
+          <label>Next scan</label>
+          <div class="value" id="stat-next">—</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="panel actions">
+      <button id="refresh">Refresh</button>
+      <button class="secondary" id="per-page">Per page: <span id="per-page-value">10</span></button>
+      <div class="info" id="status-text" style="color: var(--muted); font-weight: 600;">Loading…</div>
+    </div>
+
+    <div id="error" class="error panel" style="display:none;"></div>
+
+    <section class="list" id="servers"></section>
+    <div id="empty" class="empty panel" style="display:none;">No servers available yet. Try refreshing or wait for the next scan.</div>
+
+    <div class="panel pagination">
+      <button class="secondary" id="prev">Prev</button>
+      <div class="info" id="page-info">Page 1 / 1</div>
+      <button id="next">Next</button>
+    </div>
+
+    <div class="panel about">
+      Built for the Telegram bot mini app experience. Copy configs instantly, even when they are long — we fall back to a shareable link if available.
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    const state = {
+      page: 0,
+      perPage: 10,
+      total: 0,
+      servers: [],
+      status: null,
+    };
+
+    const els = {
+      servers: document.getElementById("servers"),
+      statusText: document.getElementById("status-text"),
+      statScan: document.getElementById("stat-scan"),
+      statTested: document.getElementById("stat-tested"),
+      statActive: document.getElementById("stat-active"),
+      statNext: document.getElementById("stat-next"),
+      progress: document.getElementById("progress-bar"),
+      perPage: document.getElementById("per-page"),
+      perPageValue: document.getElementById("per-page-value"),
+      pageInfo: document.getElementById("page-info"),
+      prev: document.getElementById("prev"),
+      next: document.getElementById("next"),
+      empty: document.getElementById("empty"),
+      error: document.getElementById("error"),
+      toast: document.getElementById("toast"),
+    };
+
+    function flagFromCountry(code) {
+      if (!code) return "";
+      const cc = code.trim().slice(0, 2).toUpperCase();
+      if (cc.length !== 2 || !/^[A-Z]+$/.test(cc)) return "";
+      const base = 0x1F1E6;
+      return String.fromCodePoint(base + (cc.charCodeAt(0) - 65)) + String.fromCodePoint(base + (cc.charCodeAt(1) - 65));
+    }
+
+    function splitFlagAndName(name, country) {
+      const raw = (name || "Server").trim();
+      const flagPattern = /[\u{1F1E6}-\u{1F1FF}]{2}/gu;
+      const nameFlags = [...raw.matchAll(flagPattern)];
+      const cleaned = raw.replace(flagPattern, " ").replace(/^[\s\-\|_]+|[\s\-\|_]+$/g, "").trim() || "Server";
+      const flagFromName = nameFlags.length ? nameFlags[nameFlags.length - 1][0] : "";
+      const flagFromCountryCode = flagFromCountry(country);
+      const flag = flagFromCountryCode || flagFromName || "🌐";
+      return { flag, name: cleaned };
+    }
+
+    function formatLatency(latency) {
+      if (latency === null || latency === undefined) return "—";
+      return `${latency} ms`;
+    }
+
+    function formatDate(iso) {
+      if (!iso) return "—";
+      const dt = new Date(iso);
+      if (Number.isNaN(dt.getTime())) return "—";
+      return dt.toLocaleString();
+    }
+
+    function showToast(text) {
+      els.toast.textContent = text;
+      els.toast.classList.add("show");
+      setTimeout(() => els.toast.classList.remove("show"), 1800);
+    }
+
+    async function copyConfig(server) {
+      let payload = server.config;
+      try {
+        if (!payload && server.copy_url) {
+          const resp = await fetch(server.copy_url);
+          if (resp.ok) payload = await resp.text();
+        }
+        if (!payload) {
+          const resp = await fetch(`/api/servers/${server.id}/config`);
+          if (resp.ok) {
+            const data = await resp.json();
+            payload = data.config;
+          }
+        }
+        if (!payload) throw new Error("No config available");
+
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(payload);
+          showToast("Copied to clipboard");
+        } else if (tg?.HapticFeedback) {
+          tg.HapticFeedback.notificationOccurred("success");
+        }
+        if (tg?.showPopup) {
+          tg.showPopup({ title: "Copied", message: "Config is ready to paste." });
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("Copy failed");
+      }
+    }
+
+    function renderServers() {
+      els.servers.innerHTML = "";
+      if (!state.servers.length) {
+        els.empty.style.display = "block";
+        return;
+      }
+      els.empty.style.display = "none";
+      state.servers.forEach((s) => {
+        const card = document.createElement("article");
+        card.className = "card";
+        const { flag: flagEmoji, name: cleanName } = splitFlagAndName(s.name, s.country);
+        const flag = document.createElement("div");
+        flag.className = "flag";
+        flag.textContent = flagEmoji;
+        const title = document.createElement("div");
+        title.className = "title";
+        title.appendChild(flag);
+        const name = document.createElement("div");
+        name.textContent = cleanName;
+        title.appendChild(name);
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        const latency = document.createElement("span");
+        latency.className = "pill";
+        latency.textContent = `Latency: ${formatLatency(s.latency)}`;
+        meta.appendChild(latency);
+        if (s.country) {
+          const c = document.createElement("span");
+          c.className = "pill";
+          c.textContent = s.country;
+          meta.appendChild(c);
+        }
+
+        const cfg = document.createElement("div");
+        cfg.className = "code";
+        cfg.textContent = (s.config || s.copy_url || "").slice(0, 200) || "Config will appear on copy.";
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+        const copyBtn = document.createElement("button");
+        copyBtn.textContent = "Copy";
+        copyBtn.onclick = () => copyConfig(s);
+        const linkBtn = document.createElement("button");
+        linkBtn.textContent = "Get link";
+        linkBtn.className = "secondary";
+        linkBtn.disabled = !s.copy_url;
+        linkBtn.onclick = () => {
+          if (s.copy_url) {
+            navigator.clipboard?.writeText(s.copy_url);
+            showToast("Link copied");
+          }
+        };
+        actions.appendChild(copyBtn);
+        actions.appendChild(linkBtn);
+
+        card.appendChild(title);
+        card.appendChild(meta);
+        card.appendChild(cfg);
+        card.appendChild(actions);
+        els.servers.appendChild(card);
+      });
+    }
+
+    function renderStatus() {
+      const st = state.status;
+      if (!st) return;
+      els.statScan.textContent = st.is_scanning ? "Scanning…" : "Idle";
+      const pct = Math.max(0, Math.min(100, Number(st.progress || 0)));
+      els.progress.style.width = `${pct}%`;
+      els.statTested.textContent = `${st.tested || 0} / ${st.total || 0}`;
+      els.statActive.textContent = st.active ?? "—";
+      els.statNext.textContent = formatDate(st.next_scan_at) || "—";
+      els.statusText.textContent = st.message || "Ready";
+      els.perPageValue.textContent = state.perPage;
+    }
+
+    function renderPagination() {
+      const totalPages = Math.max(1, Math.ceil((state.total || 0) / state.perPage));
+      const page = Math.min(state.page, totalPages - 1);
+      state.page = page;
+      els.pageInfo.textContent = `Page ${page + 1} / ${totalPages}`;
+      els.prev.disabled = page <= 0;
+      els.next.disabled = page + 1 >= totalPages;
+    }
+
+    async function loadStatus() {
+      try {
+        const res = await fetch("/api/status");
+        if (!res.ok) throw new Error("status failed");
+        const data = await res.json();
+        state.status = data;
+        if (data.default_per_page) {
+          state.perPage = data.default_per_page;
+        }
+        els.perPageValue.textContent = state.perPage;
+        renderStatus();
+      } catch (err) {
+        console.error(err);
+        els.statusText.textContent = "Unable to load status.";
+      }
+    }
+
+    async function loadServers() {
+      els.error.style.display = "none";
+      try {
+        const res = await fetch(`/api/servers?page=${state.page}&per_page=${state.perPage}`);
+        if (!res.ok) throw new Error("servers failed");
+        const data = await res.json();
+        state.servers = data.servers || [];
+        state.total = data.total || 0;
+        renderServers();
+        renderPagination();
+      } catch (err) {
+        console.error(err);
+        els.error.textContent = "Could not load servers. Check your connection and try again.";
+        els.error.style.display = "block";
+      }
+    }
+
+    function bindEvents() {
+      document.getElementById("refresh").onclick = async () => {
+        await loadStatus();
+        await loadServers();
+        showToast("Updated");
+      };
+      els.prev.onclick = () => {
+        if (state.page > 0) {
+          state.page -= 1;
+          loadServers();
+        }
+      };
+      els.next.onclick = () => {
+        const totalPages = Math.max(1, Math.ceil((state.total || 0) / state.perPage));
+        if (state.page + 1 < totalPages) {
+          state.page += 1;
+          loadServers();
+        }
+      };
+      els.perPage.onclick = () => {
+        const next = state.perPage === 10 ? 20 : state.perPage === 20 ? 30 : 10;
+        state.perPage = next;
+        els.perPageValue.textContent = next;
+        state.page = 0;
+        loadServers();
+      };
+    }
+
+    (async function init() {
+      bindEvents();
+      await loadStatus();
+      await loadServers();
+    })();
+  </script>
+</body>
+</html>
