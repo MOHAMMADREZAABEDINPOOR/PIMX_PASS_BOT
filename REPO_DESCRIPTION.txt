@@ -1,0 +1,8 @@
+Short (one-line, for GitHub "About"):
+ربات تلگرام برای اسکن، تست و نمایش کانفیگ‌های سرور — ساده، امن و قابل توسعه.
+
+Long (for repository description / readme intro):
+PIMX_PASS_BOT یک ربات تلگرام است برای مدیریت، اسکن و تست سرورها/کانفیگ‌ها با پشتیبانی از SQLite و یک رابط وب سبک. این بات قابلیت نمایش لیست سرورها به‌صورت صفحه‌بندی، ویرایش وضعیت تست به‌صورت پیغام‌های به‌روزرسانی، و الزام عضویت در کانال را دارد. مناسب برای خودکارسازی مانیتورینگ و اشتراک‌گذاری کانفیگ‌ها بین تیم‌ها یا کانال‌ها.
+
+Suggested topics (copy to GitHub topics):
+telegram, bot, scanner, monitoring, python, sqlite, web

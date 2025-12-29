@@ -1,5 +1,7 @@
 # PIMX Telegram Bot (Python)
 
+**ربات تلگرام برای اسکن، تست و نمایش کانفیگ‌های سرور — ساده، امن و قابل توسعه.**
+
 این پروژه یک بات تلگرام است که منطق پروژه‌ی `PIMX_PERSONAL` را برای نمایش سرورها داخل تلگرام پیاده‌سازی می‌کند.
 
 ## قابلیت‌ها
@@ -35,3 +37,23 @@ python main.py
 ## نکته امنیتی
 
 توکن بات را داخل ریپو نگه ندارید. اگر قبلاً توکن را جایی منتشر کرده‌اید، از BotFather توکن را ریست کنید.
+
+## بارگذاری به GitHub
+
+> **قبل از ادامه:** اگر توکن (PAT) را افشا کرده‌اید، فوراً آن را در https://github.com/settings/tokens لغو کنید. از ارسال توکن در چت یا تعبیه آن در کد جداً خودداری کنید.
+
+برای ساخت ریپوزیتوری و push امن، دو راه دارید:
+
+1) با GitHub CLI (توصیه‌شده):
+   - نصب: https://cli.github.com/
+   - ورود تعاملی: `gh auth login`
+   - ایجاد و push: `gh repo create PIMX_PASS_BOT --public --source=. --remote=origin --push`
+   - یا از اسکریپت `scripts\push_to_github.ps1` استفاده کنید.
+
+2) با وب و HTTPS یا SSH:
+   - ریپوزیتوری روی GitHub بسازید و سپس:
+     - HTTPS: `git remote add origin https://github.com/<username>/PIMX_PASS_BOT.git` و سپس `git push -u origin main`
+     - SSH: `git remote add origin git@github.com:<username>/PIMX_PASS_BOT.git` و سپس `git push -u origin main`
+
+اگر نیاز دارید، من می‌توانم برای حذف توکن از تاریخچه گیت دستورالعمل‌های امن بدم یا اسکریپت آماده کنم.
+
