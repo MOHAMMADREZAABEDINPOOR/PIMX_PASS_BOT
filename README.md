@@ -1,7 +1,7 @@
 # PIMX_PASS_BOT 🤖
 ## Telegram Bot for Server Scanning, Testing, and Config Sharing
 
-[![Persian Description](https://img.shields.io/badge/Read-توضیحات%20فارسی-0A66C2?style=for-the-badge)](#توضیحات-فارسی)
+[![Persian Description](https://img.shields.io/badge/Read-Persian%20Description-0A66C2?style=for-the-badge)](#توضیحات-فارسی)
 
 PIMX_PASS_BOT is an automated, practical, and security-aware Telegram bot for scanning servers/configs, testing them, storing results, and presenting outputs in Telegram plus a lightweight web view.
 
