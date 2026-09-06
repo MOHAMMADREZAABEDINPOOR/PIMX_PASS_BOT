@@ -1,568 +1,1916 @@
 <!doctype html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PIMX Mini App</title>
+  <title>مینی‌اپ PIMXPASS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b1223;
-      --card: rgba(255, 255, 255, 0.06);
-      --card-strong: rgba(255, 255, 255, 0.12);
-      --accent: #6ef3c5;
-      --accent-2: #5aa8ff;
-      --text: #e8ecf5;
-      --muted: #95a0c0;
-      --danger: #ff7b7b;
-      --radius: 14px;
-      --shadow: 0 10px 50px rgba(0, 0, 0, 0.35);
+      --bg: #0a0e1a;
+      --panel: rgba(20, 30, 48, 0.6);
+      --panel-strong: rgba(20, 30, 48, 0.85);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #2dfbd1;
+      --accent-2: #5b9dff;
+      --accent-3: #ff9d5b;
+      --danger: #ff6b6b;
+      --border: rgba(148, 163, 184, 0.12);
+      --radius: 16px;
+      --shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     }
-    * { box-sizing: border-box; }
+    
+    @keyframes floatBackground {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(5%, -5%) rotate(1deg); }
+      50% { transform: translate(-5%, 5%) rotate(-1deg); }
+      75% { transform: translate(5%, 5%) rotate(0.5deg); }
+    }
+    
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(45, 251, 209, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(45, 251, 209, 0.6); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes slideIn {
+      from { 
+        opacity: 0; 
+        transform: translateY(30px);
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes rotateGradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Floating Particles */
+    .particles {
+      display: none;
+    }
+    * { 
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     body {
       margin: 0;
-      font-family: "Space Grotesk", "Manrope", system-ui, sans-serif;
+      font-family: "Vazirmatn", system-ui, sans-serif;
       color: var(--text);
-      background: radial-gradient(circle at 10% 20%, rgba(98, 84, 255, 0.12), transparent 25%),
-                  radial-gradient(circle at 80% 0%, rgba(110, 243, 197, 0.18), transparent 26%),
-                  var(--bg);
       min-height: 100vh;
-      padding: 18px;
-      line-height: 1.55;
+      padding: 16px;
+      text-align: right;
+      position: relative;
+      overflow-x: hidden;
+      background: #0a0e1a;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(45, 251, 209, 0.08) 0%, transparent 35%),
+        radial-gradient(circle at 80% 70%, rgba(91, 157, 255, 0.08) 0%, transparent 35%),
+        radial-gradient(circle at 40% 80%, rgba(255, 157, 91, 0.06) 0%, transparent 35%);
+      animation: floatBackground 25s ease-in-out infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+    
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, transparent 0%, rgba(10, 14, 26, 0.7) 100%);
+      z-index: 0;
+      pointer-events: none;
+    }
+    
+    /* Animated Background Text */
+    .bg-text {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.12;
+    }
+    
+    .bg-text-row {
+      position: absolute;
+      width: 200%;
+      white-space: nowrap;
+      font-size: 60px;
+      font-weight: 800;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 30px;
+    }
+    
+    .bg-text-row:nth-child(1) {
+      top: 5%;
+      animation: slideRight 25s linear infinite;
+    }
+    
+    .bg-text-row:nth-child(2) {
+      top: 15%;
+      animation: slideLeft 30s linear infinite;
+      color: var(--accent-2);
+    }
+    
+    .bg-text-row:nth-child(3) {
+      top: 25%;
+      animation: slideRight 28s linear infinite;
+      color: var(--accent-3);
+    }
+    
+    .bg-text-row:nth-child(4) {
+      top: 35%;
+      animation: slideLeft 32s linear infinite;
+      color: var(--accent);
+    }
+    
+    .bg-text-row:nth-child(5) {
+      top: 45%;
+      animation: slideRight 27s linear infinite;
+      color: var(--accent-2);
+    }
+    
+    .bg-text-row:nth-child(6) {
+      top: 55%;
+      animation: slideLeft 29s linear infinite;
+      color: var(--accent-3);
+    }
+    
+    .bg-text-row:nth-child(7) {
+      top: 65%;
+      animation: slideRight 31s linear infinite;
+      color: var(--accent);
+    }
+    
+    .bg-text-row:nth-child(8) {
+      top: 75%;
+      animation: slideLeft 26s linear infinite;
+      color: var(--accent-2);
+    }
+    
+    .bg-text-row:nth-child(9) {
+      top: 85%;
+      animation: slideRight 33s linear infinite;
+      color: var(--accent-3);
+    }
+    
+    .bg-text-row:nth-child(10) {
+      top: 95%;
+      animation: slideLeft 28s linear infinite;
+      color: var(--accent);
+    }
+    
+    @keyframes slideRight {
+      0% { transform: translateX(-50%); }
+      100% { transform: translateX(0%); }
+    }
+    
+    @keyframes slideLeft {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+    
+    /* Light Theme */
+    body.light-theme {
+      background: #f0f4f8;
+    }
+    
+    body.light-theme::before {
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(13, 148, 136, 0.08) 0%, transparent 35%),
+        radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.08) 0%, transparent 35%),
+        radial-gradient(circle at 40% 80%, rgba(245, 158, 11, 0.06) 0%, transparent 35%);
+    }
+    
+    body.light-theme::after {
+      background: linear-gradient(135deg, transparent 0%, rgba(240, 244, 248, 0.7) 100%);
+    }
+    
+    body.light-theme .bg-text {
+      opacity: 0.06;
+    }
+    
+    body.light-theme .panel {
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    body.light-theme .server-card {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    body.light-theme .server-card:hover {
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    body.light-theme .summary-card {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    body.light-theme .mini-card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+    
+    body.light-theme .btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: #1e293b;
+    }
+    
+    body.light-theme .btn:hover {
+      border-color: rgba(148, 163, 184, 0.5);
+    }
+    
+    body.light-theme .text,
+    body.light-theme h1,
+    body.light-theme h2,
+    body.light-theme h3,
+    body.light-theme p,
+    body.light-theme span,
+    body.light-theme strong,
+    body.light-theme div {
+      color: #1e293b;
+    }
+    
+    body.light-theme .scan-panel {
+      background: rgba(255, 255, 255, 0.8);
     }
     .shell {
-      max-width: 960px;
-      margin: 0 auto 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-bottom: 40px;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 20px;
+      position: relative;
+      z-index: 1;
     }
     .panel {
-      background: var(--card);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: var(--radius);
-      padding: 16px 18px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(4px);
+      background: rgba(15, 25, 45, 0.4);
+      border: 1px solid rgba(45, 251, 209, 0.12);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
     }
-    header.hero {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
+    
+    .panel:hover {
+      border-color: rgba(45, 251, 209, 0.25);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+      transform: translateY(-2px);
     }
-    .eyebrow {
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-size: 12px;
-      color: var(--accent);
-      margin: 0 0 6px;
-      font-weight: 700;
-    }
-    h1 {
-      margin: 0;
-      font-size: clamp(24px, 4vw, 30px);
+    .hero {
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
     }
-    .hero .sub {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-weight: 500;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
-    .status-grid {
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #2dfbd1 0%, #5b9dff 100%);
+      color: #0a0e1a;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 10px;
-      margin-top: 8px;
-    }
-    .stat {
-      background: var(--card-strong);
-      border-radius: 12px;
-      padding: 10px 12px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .stat label {
-      display: block;
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-    .stat .value {
-      font-size: 18px;
-      font-weight: 700;
-    }
-    .progress {
-      height: 8px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 999px;
+      place-items: center;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      box-shadow: 0 8px 24px rgba(45, 251, 209, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      position: relative;
       overflow: hidden;
-      margin-top: 8px;
+      animation: float 6s ease-in-out infinite;
     }
-    .progress span {
-      display: block;
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      width: 0%;
-      transition: width 0.4s ease;
+    
+    .brand-mark::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+      animation: shine 3s infinite;
     }
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
+    
+    @keyframes shine {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
     }
-    button {
-      border: none;
-      cursor: pointer;
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-weight: 700;
-      font-size: 14px;
-      color: #0a0f1f;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      transition: transform 0.15s ease, box-shadow 0.2s ease;
-      box-shadow: 0 10px 40px rgba(110, 243, 197, 0.2);
-    }
-    button.secondary {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      box-shadow: none;
-    }
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    button:not(:disabled):active {
-      transform: translateY(1px);
-    }
-    .list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 12px;
-    }
-    .card {
-      background: var(--card);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      border-radius: var(--radius);
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      box-shadow: var(--shadow);
-    }
-    .card .title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 700;
-      font-size: 16px;
-    }
-    .card .title .flag {
+    .brand h1 {
+      margin: 0;
       font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      background: linear-gradient(135deg, #2dfbd1, #5b9dff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    .meta {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+    .brand p {
+      margin: 6px 0 0;
       color: var(--muted);
       font-size: 13px;
     }
-    .pill {
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
-    .pill.good { color: var(--accent); border-color: rgba(110, 243, 197, 0.5); }
-    .pill.bad { color: var(--danger); border-color: rgba(255, 123, 123, 0.6); }
-    .code {
-      background: #0f1c35;
+    .btn {
+      font-family: inherit;
+      border: none;
       border-radius: 12px;
-      padding: 10px;
-      font-family: "Space Grotesk", monospace;
-      font-size: 12px;
-      color: #dfe8ff;
-      word-break: break-all;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 0.8rem 1.6rem;
+      background: rgba(15, 25, 45, 0.7);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      font-size: 14px;
+      font-weight: 700;
+      border: 1px solid rgba(45, 251, 209, 0.2);
     }
-    .card .actions {
-      justify-content: space-between;
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      border-color: rgba(45, 251, 209, 0.4);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    .btn.primary {
+      background: linear-gradient(135deg, #2dfbd1 0%, #5b9dff 100%);
+      color: #0a0e1a;
+      font-weight: 800;
+      border: none;
+      box-shadow: 0 4px 20px rgba(45, 251, 209, 0.3);
+    }
+    
+    .btn.primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(45, 251, 209, 0.5);
+    }
+    
+    .btn.primary:active {
+      transform: translateY(-1px);
+    }
+    .btn.ghost {
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .btn:hover { transform: translateY(-1px); }
+    
+    .hero-actions {
+      display: flex;
+      gap: 8px;
       align-items: center;
     }
-    .pagination {
+    
+    .hero-actions .btn {
+      padding: 0.6rem 1rem;
+      font-size: 16px;
+      min-width: 50px;
+    }
+    .scan-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      background: rgba(15, 25, 45, 0.6);
+      border: 1px solid rgba(45, 251, 209, 0.2);
+    }
+    .scan-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .scan-status {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .scan-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(45, 251, 209, 0.4);
+      background: rgba(45, 251, 209, 0.1);
+      position: relative;
+    }
+    
+    .scan-icon::before {
+      content: "";
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 3px solid #2dfbd1;
+      border-top-color: transparent;
+      border-right-color: transparent;
+      opacity: 0.7;
+    }
+    
+    .scan-icon.is-scanning {
+      animation: pulseGlow 2s infinite;
+    }
+    
+    .scan-icon.is-scanning::before {
+      opacity: 1;
+      animation: spin 1s linear infinite;
+    }
+    .scan-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .scan-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .scan-metrics {
+      text-align: left;
+    }
+    .scan-percent {
+      font-size: 32px;
+      font-weight: 700;
+      color: #2dfbd1;
+      text-shadow: 0 0 20px rgba(45, 251, 209, 0.5);
+    }
+    .scan-count {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .progress {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.15);
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .progress::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+      to { left: 100%; }
+    }
+    
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #2dfbd1 0%, #5b9dff 50%, #2dfbd1 100%);
+      background-size: 200% 100%;
+      box-shadow: 0 0 25px rgba(45, 251, 209, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: rotateGradient 3s linear infinite;
+      position: relative;
+    }
+    
+    .progress span::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 20px;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.5);
+      filter: blur(10px);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    .scan-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+    }
+    .scan-details {
+      margin-top: 4px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: none;
+    }
+    .scan-details-title {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .scan-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+    }
+    .scan-info-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px 12px;
+      min-height: 62px;
+    }
+    .scan-info-card span {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .scan-info-card strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .scan-info-card.primary strong {
+      color: var(--accent);
+    }
+    .scan-panel.is-idle .progress {
+      display: none;
+    }
+    .scan-panel.is-idle .scan-details {
+      display: block;
+    }
+    .mini-card {
+      background: rgba(15, 25, 45, 0.6);
+      border: 1px solid rgba(45, 251, 209, 0.2);
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .mini-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(45, 251, 209, 0.4);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+    
+    .mini-card span {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    
+    .mini-card strong {
+      display: block;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(45, 251, 209, 0.5);
+    }
+    .status-panel .status-title {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .status-text {
+      white-space: pre-line;
+      line-height: 1.6;
+      color: var(--text);
+      font-size: 13px;
+      min-height: 44px;
+    }
+    .error {
+      color: var(--danger);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+    }
+    .summary-card {
+      background: rgba(15, 25, 45, 0.5);
+      border-radius: 16px;
+      border: 1px solid rgba(45, 251, 209, 0.15);
+      padding: 22px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    .summary-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(45, 251, 209, 0.3);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    }
+    
+    .summary-card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .summary-card:hover .summary-card-icon {
+      transform: rotate(10deg) scale(1.1);
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .summary-card-content {
+      flex: 1;
+    }
+    
+    .summary-card span {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    
+    .summary-card strong {
+      display: block;
+      font-size: 32px;
+      font-weight: 800;
+      text-shadow: 0 0 20px currentColor;
+    }
+    .list-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
     }
-    .pagination .info {
-      color: var(--muted);
-      font-weight: 600;
-    }
-    .empty, .error {
-      padding: 16px;
-      background: var(--card);
-      border-radius: var(--radius);
-      border: 1px dashed rgba(255, 255, 255, 0.15);
-      color: var(--muted);
-      text-align: center;
-    }
-    .toast {
-      position: fixed;
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(11, 18, 35, 0.9);
+    .list-header h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
       color: var(--text);
-      padding: 12px 16px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: var(--shadow);
-      opacity: 0;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      pointer-events: none;
-      font-weight: 600;
-      z-index: 5;
     }
-    .toast.show {
-      opacity: 1;
-      transform: translate(-50%, -4px);
-    }
-    .about {
+    .list-header p {
+      margin: 6px 0 0;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 12px;
+    }
+    .pill {
+      background: rgba(91, 157, 255, 0.15);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      color: #5b9dff;
+      font-weight: 600;
+      border: 1px solid rgba(91, 157, 255, 0.3);
+    }
+    .servers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .server-card {
+      background: rgba(15, 25, 45, 0.5);
+      border-radius: 14px;
+      border: 1px solid rgba(45, 251, 209, 0.15);
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: 180px;
+      transition: all 0.3s ease;
+    }
+    
+    .server-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(45, 251, 209, 0.3);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    }
+    .server-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .badge-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
     }
     .badge {
-      padding: 4px 8px;
-      border-radius: 10px;
-      background: rgba(110, 243, 197, 0.12);
-      color: var(--accent);
+      background: rgba(20, 30, 48, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: var(--muted);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 11px;
       font-weight: 700;
-      font-size: 12px;
-      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
     }
-    @media (max-width: 640px) {
-      body { padding: 14px; }
-      .card { padding: 12px; }
-      .panel { padding: 14px; }
+    
+    .badge::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .badge:hover::before {
+      left: 100%;
+    }
+    .badge.accent {
+      color: #2dfbd1;
+      border-color: rgba(45, 251, 209, 0.4);
+      background: rgba(45, 251, 209, 0.15);
+      box-shadow: 0 0 15px rgba(45, 251, 209, 0.3);
+    }
+    
+    .badge.blue {
+      color: #5b9dff;
+      border-color: rgba(91, 157, 255, 0.4);
+      background: rgba(91, 157, 255, 0.15);
+      box-shadow: 0 0 15px rgba(91, 157, 255, 0.3);
+    }
+    .latency {
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      box-shadow: 0 0 15px currentColor;
+      text-shadow: 0 0 10px currentColor;
+      animation: float 4s ease-in-out infinite;
+    }
+    .latency.good {
+      color: #22c55e;
+      background: rgba(34, 197, 94, 0.16);
+      border-color: rgba(34, 197, 94, 0.3);
+    }
+    .latency.warn {
+      color: #facc15;
+      background: rgba(234, 179, 8, 0.16);
+      border-color: rgba(234, 179, 8, 0.3);
+    }
+    .latency.bad {
+      color: #fb7185;
+      background: rgba(244, 63, 94, 0.16);
+      border-color: rgba(244, 63, 94, 0.3);
+    }
+    .server-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text);
+    }
+    .server-meta {
+      font-size: 12px;
+      color: var(--muted);
+      direction: ltr;
+      text-align: left;
+    }
+    .server-meta.rtl {
+      direction: rtl;
+      text-align: right;
+    }
+    .server-config {
+      font-size: 12px;
+      color: #b7c4e6;
+      direction: ltr;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+    .server-config.rtl {
+      direction: rtl;
+      text-align: right;
+    }
+    .server-actions {
+      margin-top: auto;
+      display: flex;
+      gap: 8px;
+    }
+    .server-actions .btn {
+      width: 100%;
+    }
+    .server-actions .btn {
+      flex: 1;
+      justify-content: center;
+    }
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 24px 0;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    /* Responsive Design - Mobile First */
+    @media (max-width: 768px) {
+      body { padding: 12px; }
+      
+      .bg-text-row {
+        font-size: 40px;
+        letter-spacing: 20px;
+      }
+      
+      .shell { gap: 16px; }
+      
+      .panel { 
+        padding: 16px;
+        border-radius: 12px;
+      }
+      
+      .hero {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .hero-actions { 
+        width: 100%;
+        justify-content: stretch;
+      }
+      
+      .hero-actions .btn {
+        flex: 1;
+      }
+      
+      .scan-cards {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+      
+      .mini-card {
+        padding: 12px;
+      }
+      
+      .mini-card strong {
+        font-size: 20px;
+      }
+      
+      .summary-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      
+      .summary-card {
+        padding: 16px;
+      }
+      
+      .summary-card-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+      }
+      
+      .summary-card strong {
+        font-size: 24px;
+      }
+      
+      .servers-grid { 
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      
+      .server-card {
+        padding: 16px;
+      }
+      
+      .brand h1 {
+        font-size: 16px;
+      }
+      
+      .brand p {
+        font-size: 12px;
+      }
+    }
+    
+    /* Extra Small Devices - 350px and up */
+    @media (max-width: 480px) {
+      body { padding: 10px; }
+      
+      .bg-text-row {
+        font-size: 30px;
+        letter-spacing: 15px;
+      }
+      
+      .shell { gap: 12px; }
+      
+      .panel { 
+        padding: 14px;
+        border-radius: 10px;
+      }
+      
+      .brand-mark {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+      }
+      
+      .brand h1 {
+        font-size: 14px;
+      }
+      
+      .brand p {
+        font-size: 11px;
+      }
+      
+      .btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 13px;
+      }
+      
+      .scan-title {
+        font-size: 15px;
+      }
+      
+      .scan-percent {
+        font-size: 24px;
+      }
+      
+      .scan-count {
+        font-size: 11px;
+      }
+      
+      .mini-card {
+        padding: 10px;
+      }
+      
+      .mini-card span {
+        font-size: 11px;
+      }
+      
+      .mini-card strong {
+        font-size: 18px;
+      }
+      
+      .summary-card {
+        padding: 14px;
+        gap: 12px;
+      }
+      
+      .summary-card-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 22px;
+      }
+      
+      .summary-card span {
+        font-size: 12px;
+      }
+      
+      .summary-card strong {
+        font-size: 20px;
+      }
+      
+      .server-card {
+        padding: 14px;
+        min-height: 160px;
+      }
+      
+      .server-title {
+        font-size: 14px;
+      }
+      
+      .list-header h2 {
+        font-size: 16px;
+      }
+      
+      .list-header p {
+        font-size: 11px;
+      }
+      
+      .pill {
+        font-size: 11px;
+        padding: 5px 12px;
+      }
+    }
+    
+    /* Ultra Small - 350px */
+    @media (max-width: 360px) {
+      body { padding: 8px; }
+      
+      .bg-text-row {
+        font-size: 24px;
+        letter-spacing: 12px;
+      }
+      
+      .shell { gap: 10px; }
+      
+      .panel { padding: 12px; }
+      
+      .scan-cards {
+        gap: 6px;
+      }
+      
+      .mini-card {
+        padding: 8px;
+      }
+      
+      .mini-card span {
+        font-size: 10px;
+        margin-bottom: 4px;
+      }
+      
+      .mini-card strong {
+        font-size: 16px;
+      }
+      
+      .summary-grid { gap: 10px; }
+      
+      .servers-grid { gap: 10px; }
+      
+      .brand-mark {
+        width: 32px;
+        height: 32px;
+      }
+      
+      .btn {
+        padding: 0.5rem 1rem;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Animated Background Text -->
+  <div class="bg-text">
+    <div class="bg-text-row">VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN </div>
+    <div class="bg-text-row">VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS </div>
+    <div class="bg-text-row">TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS </div>
+    <div class="bg-text-row">VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN </div>
+    <div class="bg-text-row">VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS </div>
+    <div class="bg-text-row">TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS </div>
+    <div class="bg-text-row">VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN </div>
+    <div class="bg-text-row">VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS </div>
+    <div class="bg-text-row">TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS </div>
+    <div class="bg-text-row">VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN VLESS VMESS TROJAN </div>
+  </div>
+  
   <div class="shell">
-    <header class="hero panel">
-      <div>
-        <p class="eyebrow">PIMX Mini App</p>
-        <h1>Live server board <span class="badge">beta</span></h1>
-        <p class="sub">Same sources as the bot, packed in a Telegram WebApp for quick copying.</p>
+    <header class="panel hero">
+      <div class="brand">
+        <div class="brand-mark">PX</div>
+        <div>
+          <h1 data-fa="PIMXPASS | پایش و کپی سرورها" data-en="PIMXPASS | Monitor & Copy Servers">PIMXPASS | پایش و کپی سرورها</h1>
+          <p data-fa="آخرین وضعیت اسکن‌ها و لیست سرورهای فعال را همین‌جا ببینید." data-en="View the latest scan status and active server list here.">آخرین وضعیت اسکن‌ها و لیست سرورهای فعال را همین‌جا ببینید.</p>
+        </div>
       </div>
-      <div class="status-grid" id="status-grid">
-        <div class="stat">
-          <label>Scan</label>
-          <div class="value" id="stat-scan">—</div>
-          <div class="progress"><span id="progress-bar"></span></div>
-        </div>
-        <div class="stat">
-          <label>Tested / Total</label>
-          <div class="value" id="stat-tested">—</div>
-        </div>
-        <div class="stat">
-          <label>Active found</label>
-          <div class="value" id="stat-active">—</div>
-        </div>
-        <div class="stat">
-          <label>Next scan</label>
-          <div class="value" id="stat-next">—</div>
-        </div>
+      <div class="hero-actions">
+        <button class="btn ghost" id="btn-theme" title="Toggle Theme">🌓</button>
+        <button class="btn ghost" id="btn-lang" title="Change Language">EN</button>
       </div>
     </header>
 
-    <div class="panel actions">
-      <button id="refresh">Refresh</button>
-      <button class="secondary" id="per-page">Per page: <span id="per-page-value">10</span></button>
-      <div class="info" id="status-text" style="color: var(--muted); font-weight: 600;">Loading…</div>
-    </div>
+    <section class="panel scan-panel" id="scan-panel">
+      <div class="scan-head">
+        <div class="scan-status">
+          <div class="scan-icon" id="scan-icon"></div>
+          <div>
+            <div class="scan-title" id="scan-title">اسکن در حال انجام است.</div>
+            <div class="scan-sub" id="scan-sub"><span id="scan-count">0/0</span> تست شد (<span id="scan-count-active">0</span> فعال)</div>
+          </div>
+        </div>
+        <div class="scan-metrics">
+          <div class="scan-percent" id="scan-percent">0%</div>
+        </div>
+      </div>
+      <div class="progress" id="scan-progress"><span id="scan-bar"></span></div>
+      <div class="scan-details" id="scan-details">
+        <div class="scan-details-title">وضعیت اسکن</div>
+        <div class="scan-info-grid">
+          <div class="scan-info-card primary">
+            <span>وضعیت</span>
+            <strong id="scan-info-state">اسکن فعال نیست.</strong>
+          </div>
+          <div class="scan-info-card">
+            <span>آخرین اسکن</span>
+            <strong id="scan-info-last">نامشخص</strong>
+          </div>
+          <div class="scan-info-card">
+            <span>اسکن بعدی</span>
+            <strong id="scan-info-next">نامشخص</strong>
+          </div>
+          <div class="scan-info-card">
+            <span>زمان باقی‌مانده</span>
+            <strong id="scan-info-remaining">—</strong>
+          </div>
+        </div>
+      </div>
+      <div class="scan-cards">
+        <div class="mini-card">
+          <span>کل</span>
+          <strong id="stat-total" style="color: #ff9d5b;">0</strong>
+        </div>
+        <div class="mini-card">
+          <span>فعال</span>
+          <strong id="stat-active" style="color: #2dfbd1;">0</strong>
+        </div>
+        <div class="mini-card">
+          <span>تست شده</span>
+          <strong id="stat-tested" style="color: #5b9dff;">0</strong>
+        </div>
+      </div>
+    </section>
 
-    <div id="error" class="error panel" style="display:none;"></div>
+    <section class="panel status-panel">
+      <div class="status-title">وضعیت اسکن</div>
+      <div class="status-text" id="status-text">در حال دریافت اطلاعات...</div>
+      <div id="error-text" class="error"></div>
+    </section>
 
-    <section class="list" id="servers"></section>
-    <div id="empty" class="empty panel" style="display:none;">No servers available yet. Try refreshing or wait for the next scan.</div>
+    <section class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-card-icon" style="background: rgba(91, 157, 255, 0.15); color: #5b9dff;">⚡</div>
+        <div class="summary-card-content">
+          <span>آپتایم</span>
+          <strong id="summary-uptime" style="color: #5b9dff;">0%</strong>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-card-icon" style="background: rgba(255, 157, 91, 0.15); color: #ff9d5b;">⚡</div>
+        <div class="summary-card-content">
+          <span>میانگین پینگ</span>
+          <strong id="summary-latency" style="color: #ff9d5b;">0ms</strong>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-card-icon" style="background: rgba(45, 251, 209, 0.15); color: #2dfbd1;">🚀</div>
+        <div class="summary-card-content">
+          <span>سرور فعال</span>
+          <strong id="summary-active" style="color: #2dfbd1;">0</strong>
+        </div>
+      </div>
+    </section>
 
-    <div class="panel pagination">
-      <button class="secondary" id="prev">Prev</button>
-      <div class="info" id="page-info">Page 1 / 1</div>
-      <button id="next">Next</button>
-    </div>
+    <section class="panel list-header">
+      <div>
+        <h2>سرورهای فعال (<span id="active-count">0</span>)</h2>
+        <p>نتایج به‌صورت دوره‌ای بروزرسانی می‌شود.</p>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <button class="btn primary" id="btn-copy-all">📋 <span data-fa="کپی همه سرورها" data-en="Copy All Servers">کپی همه سرورها</span></button>
+        <span class="pill" data-fa="حداکثر ۱۵۰ سرور" data-en="Max 150 servers">حداکثر ۱۵۰ سرور</span>
+      </div>
+    </section>
 
-    <div class="panel about">
-      Built for the Telegram bot mini app experience. Copy configs instantly, even when they are long — we fall back to a shareable link if available.
-    </div>
+    <section class="servers-grid" id="servers-grid"></section>
+    <section class="empty" id="empty-text" style="display: none;">هیچ سرور فعالی یافت نشد.</section>
   </div>
 
-  <div class="toast" id="toast"></div>
-
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
-      tg.expand();
-    }
-
     const state = {
-      page: 0,
-      perPage: 10,
-      total: 0,
-      servers: [],
       status: null,
+      servers: [],
+      perPage: 5000,
+      total: 0,
+      base: "",
     };
 
     const els = {
-      servers: document.getElementById("servers"),
-      statusText: document.getElementById("status-text"),
-      statScan: document.getElementById("stat-scan"),
+      scanIcon: document.getElementById("scan-icon"),
+      scanTitle: document.getElementById("scan-title"),
+      scanSub: document.getElementById("scan-sub"),
+      scanPercent: document.getElementById("scan-percent"),
+      scanCount: document.getElementById("scan-count"),
+      scanCountActive: document.getElementById("scan-count-active"),
+      scanBar: document.getElementById("scan-bar"),
+      scanPanel: document.getElementById("scan-panel"),
+      scanInfoState: document.getElementById("scan-info-state"),
+      scanInfoLast: document.getElementById("scan-info-last"),
+      scanInfoNext: document.getElementById("scan-info-next"),
+      scanInfoRemaining: document.getElementById("scan-info-remaining"),
       statTested: document.getElementById("stat-tested"),
       statActive: document.getElementById("stat-active"),
-      statNext: document.getElementById("stat-next"),
-      progress: document.getElementById("progress-bar"),
-      perPage: document.getElementById("per-page"),
-      perPageValue: document.getElementById("per-page-value"),
-      pageInfo: document.getElementById("page-info"),
-      prev: document.getElementById("prev"),
-      next: document.getElementById("next"),
-      empty: document.getElementById("empty"),
-      error: document.getElementById("error"),
-      toast: document.getElementById("toast"),
+      statTotal: document.getElementById("stat-total"),
+      statusText: document.getElementById("status-text"),
+      errorText: document.getElementById("error-text"),
+      statusPanel: document.querySelector(".status-panel"),
+      serversGrid: document.getElementById("servers-grid"),
+      emptyText: document.getElementById("empty-text"),
+      btnCopyAll: document.getElementById("btn-copy-all"),
+      summaryActive: document.getElementById("summary-active"),
+      summaryLatency: document.getElementById("summary-latency"),
+      summaryUptime: document.getElementById("summary-uptime"),
+      activeCount: document.getElementById("active-count"),
     };
 
-    function flagFromCountry(code) {
-      if (!code) return "";
-      const cc = code.trim().slice(0, 2).toUpperCase();
-      if (cc.length !== 2 || !/^[A-Z]+$/.test(cc)) return "";
-      const base = 0x1F1E6;
-      return String.fromCodePoint(base + (cc.charCodeAt(0) - 65)) + String.fromCodePoint(base + (cc.charCodeAt(1) - 65));
-    }
-
-    function splitFlagAndName(name, country) {
-      const raw = (name || "Server").trim();
-      const flagPattern = /[\u{1F1E6}-\u{1F1FF}]{2}/gu;
-      const nameFlags = [...raw.matchAll(flagPattern)];
-      const cleaned = raw.replace(flagPattern, " ").replace(/^[\s\-\|_]+|[\s\-\|_]+$/g, "").trim() || "Server";
-      const flagFromName = nameFlags.length ? nameFlags[nameFlags.length - 1][0] : "";
-      const flagFromCountryCode = flagFromCountry(country);
-      const flag = flagFromCountryCode || flagFromName || "🌐";
-      return { flag, name: cleaned };
-    }
-
-    function formatLatency(latency) {
-      if (latency === null || latency === undefined) return "—";
-      return `${latency} ms`;
-    }
-
-    function formatDate(iso) {
-      if (!iso) return "—";
-      const dt = new Date(iso);
-      if (Number.isNaN(dt.getTime())) return "—";
-      return dt.toLocaleString();
-    }
-
-    function showToast(text) {
-      els.toast.textContent = text;
-      els.toast.classList.add("show");
-      setTimeout(() => els.toast.classList.remove("show"), 1800);
-    }
-
-    async function copyConfig(server) {
-      let payload = server.config;
-      try {
-        if (!payload && server.copy_url) {
-          const resp = await fetch(server.copy_url);
-          if (resp.ok) payload = await resp.text();
-        }
-        if (!payload) {
-          const resp = await fetch(`/api/servers/${server.id}/config`);
-          if (resp.ok) {
-            const data = await resp.json();
-            payload = data.config;
-          }
-        }
-        if (!payload) throw new Error("No config available");
-
-        if (navigator.clipboard?.writeText) {
-          await navigator.clipboard.writeText(payload);
-          showToast("Copied to clipboard");
-        } else if (tg?.HapticFeedback) {
-          tg.HapticFeedback.notificationOccurred("success");
-        }
-        if (tg?.showPopup) {
-          tg.showPopup({ title: "Copied", message: "Config is ready to paste." });
-        }
-      } catch (err) {
-        console.error(err);
-        showToast("Copy failed");
+    function computeBase() {
+      const path = window.location.pathname || "";
+      const candidates = ["/webapp", "/app", "/"];
+      for (const suffix of candidates) {
+        const idx = path.indexOf(suffix);
+        if (idx >= 0) return path.slice(0, idx) || "";
       }
+      return path.replace(/\/+$/, "");
     }
 
-    function renderServers() {
-      els.servers.innerHTML = "";
-      if (!state.servers.length) {
-        els.empty.style.display = "block";
-        return;
-      }
-      els.empty.style.display = "none";
-      state.servers.forEach((s) => {
-        const card = document.createElement("article");
-        card.className = "card";
-        const { flag: flagEmoji, name: cleanName } = splitFlagAndName(s.name, s.country);
-        const flag = document.createElement("div");
-        flag.className = "flag";
-        flag.textContent = flagEmoji;
-        const title = document.createElement("div");
-        title.className = "title";
-        title.appendChild(flag);
-        const name = document.createElement("div");
-        name.textContent = cleanName;
-        title.appendChild(name);
+    function safeText(value, fallback = "?") {
+      if (value === null || value === undefined || value === "") return fallback;
+      return String(value);
+    }
 
-        const meta = document.createElement("div");
-        meta.className = "meta";
-        const latency = document.createElement("span");
-        latency.className = "pill";
-        latency.textContent = `Latency: ${formatLatency(s.latency)}`;
-        meta.appendChild(latency);
-        if (s.country) {
-          const c = document.createElement("span");
-          c.className = "pill";
-          c.textContent = s.country;
-          meta.appendChild(c);
-        }
+    function parseIso(value) {
+      if (!value) return null;
+      if (value.includes("T")) return new Date(value);
+      return new Date(value.replace(" ", "T") + "Z");
+    }
 
-        const cfg = document.createElement("div");
-        cfg.className = "code";
-        cfg.textContent = (s.config || s.copy_url || "").slice(0, 200) || "Config will appear on copy.";
-
-        const actions = document.createElement("div");
-        actions.className = "actions";
-        const copyBtn = document.createElement("button");
-        copyBtn.textContent = "Copy";
-        copyBtn.onclick = () => copyConfig(s);
-        const linkBtn = document.createElement("button");
-        linkBtn.textContent = "Get link";
-        linkBtn.className = "secondary";
-        linkBtn.disabled = !s.copy_url;
-        linkBtn.onclick = () => {
-          if (s.copy_url) {
-            navigator.clipboard?.writeText(s.copy_url);
-            showToast("Link copied");
-          }
-        };
-        actions.appendChild(copyBtn);
-        actions.appendChild(linkBtn);
-
-        card.appendChild(title);
-        card.appendChild(meta);
-        card.appendChild(cfg);
-        card.appendChild(actions);
-        els.servers.appendChild(card);
+    function getIranParts(date) {
+      const fmt = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Tehran",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
       });
+      const parts = fmt.formatToParts(date);
+      const find = (type) => parts.find((p) => p.type === type)?.value || "00";
+      return {
+        year: parseInt(find("year"), 10),
+        month: parseInt(find("month"), 10),
+        day: parseInt(find("day"), 10),
+        hour: find("hour"),
+        minute: find("minute"),
+      };
+    }
+    
+    // Get saved language for use in functions
+    function getSavedLanguage() {
+      return localStorage.getItem('language') || 'fa';
+    }
+    
+    // Get translation based on current language
+    function t(key) {
+      const lang = getSavedLanguage();
+      const translations = {
+        // Scan status
+        'scan_in_progress': lang === 'fa' ? "اسکن در حال انجام است." : "Scan is in progress.",
+        'scan_stopped': lang === 'fa' ? "اسکن متوقف است." : "Scan is stopped.",
+        'scanning_servers': lang === 'fa' ? "در حال اسکن سرورها..." : "Scanning servers...",
+        'no_scan_active': lang === 'fa' ? "اسکن فعال نیست." : "No scan active.",
+        'tested': lang === 'fa' ? "تست شد" : "tested",
+        'active': lang === 'fa' ? "فعال" : "active",
+        
+        // Scan info
+        'status': lang === 'fa' ? "وضعیت" : "Status",
+        'last_scan': lang === 'fa' ? "آخرین اسکن:" : "Last scan:",
+        'next_scan': lang === 'fa' ? "اسکن بعدی:" : "Next scan:",
+        'time_remaining': lang === 'fa' ? "زمان باقی‌مانده:" : "Time remaining:",
+        
+        // Mini cards
+        'total': lang === 'fa' ? "کل" : "Total",
+        'active_servers': lang === 'fa' ? "فعال" : "Active",
+        'tested_servers': lang === 'fa' ? "تست شده" : "Tested",
+        
+        // Summary cards
+        'uptime': lang === 'fa' ? "آپتایم" : "Uptime",
+        'avg_ping': lang === 'fa' ? "میانگین پینگ" : "Avg Ping",
+        'active_count': lang === 'fa' ? "سرور فعال" : "Active Servers",
+        
+        // List header
+        'active_servers_header': lang === 'fa' ? "سرورهای فعال" : "Active Servers",
+        'results_update': lang === 'fa' ? "نتایج به‌صورت دوره‌ای بروزرسانی می‌شود." : "Results update periodically.",
+        
+        // Status panel
+        'scan_status': lang === 'fa' ? "وضعیت اسکن" : "Scan Status",
+        
+        // Buttons
+        'copy_all': lang === 'fa' ? "کپی همه سرورها" : "Copy All Servers",
+        'copy': lang === 'fa' ? "کپی" : "Copy",
+        'copied': lang === 'fa' ? "کپی شد" : "Copied",
+        
+        // Server card
+        'country': lang === 'fa' ? "کشور:" : "Country:",
+        'unknown': lang === 'fa' ? "نامشخص" : "Unknown",
+        
+        // Empty state
+        'no_servers_found': lang === 'fa' ? "هیچ سرور فعالی یافت نشد." : "No active servers found.",
+        
+        // Error messages
+        'no_servers_to_copy': lang === 'fa' ? "سروری برای کپی وجود ندارد." : "No servers to copy.",
+        'connection_error': lang === 'fa' ? "خطا در ارتباط" : "Connection error",
+        'scan_status_error': lang === 'fa' ? "خطا در دریافت وضعیت اسکن" : "Error fetching scan status",
+        'servers_error': lang === 'fa' ? "خطا در دریافت سرورها" : "Error fetching servers",
+        
+        // Scan details
+        'scan_details': lang === 'fa' ? "وضعیت اسکن" : "Scan Status",
+      };
+      return translations[key] || key;
+    }
+
+    function gregorianToJalali(gy, gm, gd) {
+      const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+      let jy = 0;
+      if (gy > 1600) {
+        jy = 979;
+        gy -= 1600;
+      } else {
+        jy = 0;
+        gy -= 621;
+      }
+      const gy2 = gm > 2 ? gy + 1 : gy;
+      let days =
+        365 * gy +
+        Math.floor((gy2 + 3) / 4) -
+        Math.floor((gy2 + 99) / 100) +
+        Math.floor((gy2 + 399) / 400) -
+        80 +
+        gd +
+        g_d_m[gm - 1];
+      jy += 33 * Math.floor(days / 12053);
+      days %= 12053;
+      jy += 4 * Math.floor(days / 1461);
+      days %= 1461;
+      if (days > 365) {
+        jy += Math.floor((days - 1) / 365);
+        days = (days - 1) % 365;
+      }
+      let jm;
+      let jd;
+      if (days < 186) {
+        jm = 1 + Math.floor(days / 31);
+        jd = 1 + (days % 31);
+      } else {
+        jm = 7 + Math.floor((days - 186) / 30);
+        jd = 1 + ((days - 186) % 30);
+      }
+      return [jy, jm, jd];
+    }
+
+    function formatIranJalali(value) {
+      const parsed = parseIso(value);
+      if (!parsed || Number.isNaN(parsed.getTime())) return "?";
+      try {
+        const fmt = new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+          timeZone: "Asia/Tehran",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        return fmt.format(parsed).replace("?", " ");
+      } catch (err) {
+        const parts = getIranParts(parsed);
+        const [jy, jm, jd] = gregorianToJalali(parts.year, parts.month, parts.day);
+        const jmm = String(jm).padStart(2, "0");
+        const jdd = String(jd).padStart(2, "0");
+        return `${jy}-${jmm}-${jdd} ${parts.hour}:${parts.minute}`;
+      }
+    }
+
+    function formatIranWithComma(value) {
+      const raw = formatIranJalali(value);
+      if (!raw || raw === "?") return "?";
+      if (raw.includes("،")) return raw;
+      if (raw.includes(",")) return raw.replace(",", "،");
+      if (raw.includes(" ")) {
+        const parts = raw.split(" ");
+        const datePart = parts[0];
+        const timePart = parts.slice(1).join(" ");
+        return `${datePart}، ${timePart}`;
+      }
+      return raw;
+    }
+
+    function formatUntil(target) {
+      const targetDate = parseIso(target);
+      if (!targetDate || Number.isNaN(targetDate.getTime())) return "";
+      const diff = targetDate.getTime() - Date.now();
+      if (diff <= 0) return "";
+      const totalSeconds = Math.floor(diff / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      if (minutes <= 0) return `${seconds} ثانیه`;
+      return `${minutes} دقیقه و ${String(seconds).padStart(2, "0")} ثانیه`;
+    }
+
+    function parseConfigMeta(config) {
+      const base = String(config || "").split("#")[0].trim();
+      const scheme = base.includes("://") ? base.split("://")[0] : "VLESS";
+      let host = "";
+      let port = "";
+      let transport = "";
+      try {
+        const url = new URL(base);
+        host = url.hostname || "";
+        port = url.port || "";
+        transport = url.searchParams.get("type") || url.searchParams.get("transport") || "";
+      } catch (err) {
+        host = "";
+      }
+      return {
+        scheme: scheme ? scheme.toUpperCase() : "VLESS",
+        host,
+        port,
+        transport: transport ? transport.toUpperCase() : "TCP",
+      };
+    }
+
+    function configPreview(config, meta, maxLen = 48) {
+      const raw = String(config || "").trim();
+      if (!raw) return "نامشخص";
+      let preview = "";
+      if (meta && meta.host) {
+        const port = meta.port ? `:${meta.port}` : "";
+        preview = `${meta.host}${port}`;
+      } else {
+        preview = raw;
+        const schemeIdx = preview.indexOf("://");
+        if (schemeIdx >= 0) {
+          preview = preview.slice(schemeIdx + 3);
+        }
+        const hashIdx = preview.indexOf("#");
+        if (hashIdx >= 0) {
+          preview = preview.slice(0, hashIdx);
+        }
+      }
+      if (preview.length > maxLen) {
+        return `${preview.slice(0, maxLen - 3)}...`;
+      }
+      return preview;
+    }
+
+    function latencyClass(latency) {
+      if (!Number.isFinite(latency)) return "bad";
+      if (latency < 120) return "good";
+      if (latency < 220) return "warn";
+      return "bad";
     }
 
     function renderStatus() {
       const st = state.status;
       if (!st) return;
-      els.statScan.textContent = st.is_scanning ? "Scanning…" : "Idle";
-      const pct = Math.max(0, Math.min(100, Number(st.progress || 0)));
-      els.progress.style.width = `${pct}%`;
-      els.statTested.textContent = `${st.tested || 0} / ${st.total || 0}`;
-      els.statActive.textContent = st.active ?? "—";
-      els.statNext.textContent = formatDate(st.next_scan_at) || "—";
-      els.statusText.textContent = st.message || "Ready";
-      els.perPageValue.textContent = state.perPage;
+      const total = st.total || 0;
+      const tested = st.tested || 0;
+      const active = st.active || 0;
+      const progress = Number.isFinite(st.progress)
+        ? st.progress
+        : total
+          ? Math.round((tested / total) * 100)
+          : 0;
+
+      const lang = getSavedLanguage();
+      els.scanTitle.textContent = st.is_scanning ? t('scan_in_progress') : t('scan_stopped');
+      els.scanSub.textContent = `${els.scanCount.textContent} ${t('tested')} (${els.scanCountActive.textContent} ${t('active')})`;
+      els.scanCount.textContent = `${tested}/${total}`;
+      els.scanCountActive.textContent = active || 0;
+      els.scanPercent.textContent = `${progress}%`;
+      els.scanBar.style.width = `${progress}%`;
+      els.scanIcon.classList.toggle("is-scanning", !!st.is_scanning);
+      els.scanPanel.classList.toggle("is-idle", !st.is_scanning);
+      if (els.statusPanel) {
+        els.statusPanel.style.display = st.is_scanning ? "none" : "";
+      }
+
+      els.statTested.textContent = tested || 0;
+      els.statActive.textContent = active || 0;
+      els.statTotal.textContent = total || 0;
+
+      const lines = [];
+      lines.push(st.is_scanning ? t('scanning_servers') : t('no_scan_active'));
+      if (st.scan_completed_at) {
+        lines.push(`${t('last_scan')} ${formatIranWithComma(st.scan_completed_at)}`);
+      }
+      if (st.next_scan_at) {
+        lines.push(`${t('next_scan')} ${formatIranWithComma(st.next_scan_at)}`);
+        const until = formatUntil(st.next_scan_at);
+        if (until) lines.push(`${t('time_remaining')} ${until}`);
+      }
+      els.statusText.textContent = lines.join("\n");
+      const lastScanText = st.scan_completed_at ? formatIranWithComma(st.scan_completed_at) : t('unknown');
+      const nextScanText = st.next_scan_at ? formatIranWithComma(st.next_scan_at) : t('unknown');
+      const untilText = st.next_scan_at ? formatUntil(st.next_scan_at) : "";
+      els.scanInfoState.textContent = st.is_scanning ? t('scanning_servers') : t('no_scan_active');
+      els.scanInfoLast.textContent = lastScanText;
+      els.scanInfoNext.textContent = nextScanText;
+      els.scanInfoRemaining.textContent = untilText || "—";
     }
 
-    function renderPagination() {
-      const totalPages = Math.max(1, Math.ceil((state.total || 0) / state.perPage));
-      const page = Math.min(state.page, totalPages - 1);
-      state.page = page;
-      els.pageInfo.textContent = `Page ${page + 1} / ${totalPages}`;
-      els.prev.disabled = page <= 0;
-      els.next.disabled = page + 1 >= totalPages;
-    }
-
-    async function loadStatus() {
+    async function copyText(text) {
+      if (!text) return false;
       try {
-        const res = await fetch("/api/status");
-        if (!res.ok) throw new Error("status failed");
-        const data = await res.json();
-        state.status = data;
-        if (data.default_per_page) {
-          state.perPage = data.default_per_page;
-        }
-        els.perPageValue.textContent = state.perPage;
-        renderStatus();
+        await navigator.clipboard.writeText(text);
+        return true;
       } catch (err) {
-        console.error(err);
-        els.statusText.textContent = "Unable to load status.";
+        try {
+          const el = document.createElement("textarea");
+          el.value = text;
+          el.style.position = "fixed";
+          el.style.opacity = "0";
+          document.body.appendChild(el);
+          el.select();
+          document.execCommand("copy");
+          document.body.removeChild(el);
+          return true;
+        } catch (err2) {
+          return false;
+        }
       }
     }
 
-    async function loadServers() {
-      els.error.style.display = "none";
-      try {
-        const res = await fetch(`/api/servers?page=${state.page}&per_page=${state.perPage}`);
-        if (!res.ok) throw new Error("servers failed");
-        const data = await res.json();
-        state.servers = data.servers || [];
-        state.total = data.total || 0;
-        renderServers();
-        renderPagination();
-      } catch (err) {
-        console.error(err);
-        els.error.textContent = "Could not load servers. Check your connection and try again.";
-        els.error.style.display = "block";
+    function renderServers() {
+      els.serversGrid.innerHTML = "";
+      if (!state.servers.length) {
+        els.emptyText.style.display = "block";
+        els.emptyText.innerHTML = t('no_servers_found');
+        return;
+      }
+      els.emptyText.style.display = "none";
+
+      const fragment = document.createDocumentFragment();
+      for (const server of state.servers) {
+        const card = document.createElement("div");
+        card.className = "server-card";
+
+        const meta = parseConfigMeta(server.config || "");
+        const latencyValue = Number(server.latency);
+        const latencyText = Number.isFinite(latencyValue) ? `${latencyValue}ms` : t('unknown');
+        const latencyCls = latencyClass(latencyValue);
+
+        const top = document.createElement("div");
+        top.className = "server-top";
+        const badges = document.createElement("div");
+        badges.className = "badge-group";
+        const proto = document.createElement("span");
+        proto.className = "badge accent";
+        proto.textContent = safeText(meta.scheme, "VLESS");
+        const transport = document.createElement("span");
+        transport.className = "badge blue";
+        transport.textContent = safeText(meta.transport, "TCP");
+        badges.append(proto, transport);
+
+        const latency = document.createElement("span");
+        latency.className = `latency ${latencyCls}`;
+        latency.textContent = latencyText;
+        top.append(badges, latency);
+
+        const title = document.createElement("h3");
+        title.className = "server-title";
+        title.textContent = safeText(server.name, "PIMXPASS");
+
+        const configLine = document.createElement("div");
+        configLine.className = "server-config";
+        configLine.textContent = configPreview(server.config || "", meta, 52);
+
+        const country = document.createElement("div");
+        country.className = "server-meta rtl";
+        const lang = getSavedLanguage();
+        country.textContent = `${t('country')} ${safeText(server.country, t('unknown'))}`;
+
+        const actions = document.createElement("div");
+        actions.className = "server-actions";
+        const copyBtn = document.createElement("button");
+        copyBtn.textContent = t('copy');
+        copyBtn.className = "btn primary";
+        copyBtn.onclick = async () => {
+          const ok = await copyText(server.config || "");
+          if (ok) {
+            copyBtn.textContent = t('copied');
+          } else {
+            copyBtn.textContent = t('copy');
+          }
+          setTimeout(() => (copyBtn.textContent = t('copy')), 1400);
+        };
+        actions.append(copyBtn);
+
+        card.append(top, title, configLine, country, actions);
+        fragment.appendChild(card);
+      }
+      els.serversGrid.appendChild(fragment);
+    }
+
+    function updateSummary() {
+      const latencies = state.servers
+        .map((server) => Number(server.latency))
+        .filter((value) => Number.isFinite(value));
+      const avg = latencies.length
+        ? Math.round(latencies.reduce((acc, curr) => acc + curr, 0) / latencies.length)
+        : 0;
+      const activeCount = state.servers.length;
+      const total = state.status?.total || 0;
+      const active = state.status?.active || activeCount;
+      const uptime = total ? Math.round((active / total) * 100) : 0;
+
+      els.summaryActive.textContent = activeCount;
+      els.summaryLatency.textContent = avg ? `${avg}ms` : "0ms";
+      els.summaryUptime.textContent = `${uptime}%`;
+      
+      // Update active count with language support
+      const lang = getSavedLanguage();
+      els.activeCount.textContent = activeCount;
+      
+      // Update list header with correct count
+      const listHeader = document.querySelector('.list-header h2');
+      if (listHeader) {
+        listHeader.textContent = `${t('active_servers_header')} (${activeCount})`;
       }
     }
 
-    function bindEvents() {
-      document.getElementById("refresh").onclick = async () => {
-        await loadStatus();
-        await loadServers();
-        showToast("Updated");
-      };
-      els.prev.onclick = () => {
-        if (state.page > 0) {
-          state.page -= 1;
-          loadServers();
-        }
-      };
-      els.next.onclick = () => {
-        const totalPages = Math.max(1, Math.ceil((state.total || 0) / state.perPage));
-        if (state.page + 1 < totalPages) {
-          state.page += 1;
-          loadServers();
-        }
-      };
-      els.perPage.onclick = () => {
-        const next = state.perPage === 10 ? 20 : state.perPage === 20 ? 30 : 10;
-        state.perPage = next;
-        els.perPageValue.textContent = next;
-        state.page = 0;
-        loadServers();
-      };
+    function updateCounts() {
+      // Count display removed from page-info since we now show "حداکثر ۱۵۰ سرور"
     }
 
-    (async function init() {
-      bindEvents();
-      await loadStatus();
-      await loadServers();
-    })();
+    async function fetchStatus() {
+      const res = await fetch(`${state.base}/api/status`, { cache: "no-store" });
+      if (!res.ok) throw new Error(t('scan_status_error'));
+      state.status = await res.json();
+      renderStatus();
+    }
+
+    async function fetchServers() {
+      const res = await fetch(`${state.base}/api/servers?page=0&per_page=${state.perPage}`, { cache: "no-store" });
+      if (!res.ok) throw new Error(t('servers_error'));
+      const data = await res.json();
+      state.total = data.total || 0;
+      state.perPage = data.per_page || state.perPage;
+      state.servers = data.servers || [];
+      renderServers();
+      updateCounts();
+    }
+
+    async function refreshAll() {
+      els.errorText.textContent = "";
+      try {
+        await fetchStatus();
+        await fetchServers();
+        updateSummary();
+      } catch (err) {
+        els.errorText.textContent = err.message || t('connection_error');
+      }
+    }
+
+    function setup() {
+      state.base = computeBase();
+      els.btnCopyAll.addEventListener("click", async () => {
+        if (!state.servers.length) {
+          els.errorText.textContent = t('no_servers_to_copy');
+          return;
+        }
+        const configs = state.servers.map((s) => s.config).filter(Boolean).join("\n");
+        const ok = await copyText(configs);
+        if (ok) {
+          els.btnCopyAll.innerHTML = t('copied');
+        } else {
+          els.btnCopyAll.innerHTML = t('copy');
+        }
+        setTimeout(() => (els.btnCopyAll.innerHTML = '📋 <span>' + t('copy_all') + '</span>'), 1400);
+      });
+
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        tg.ready();
+        tg.expand();
+        
+        // Apply saved theme to Telegram WebApp
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        const bgColor = savedTheme === 'light' ? '#f0f4f8' : '#0a0e1a';
+        tg.setHeaderColor(bgColor);
+        tg.setBackgroundColor(bgColor);
+      }
+
+      refreshAll();
+      setInterval(refreshAll, 5000);
+    }
+
+    setup();
+  </script>
+  <script>
+    // Theme and Language Functionality
+    document.addEventListener('DOMContentLoaded', () => {
+      const body = document.body;
+      const themeBtn = document.getElementById('btn-theme');
+      const langBtn = document.getElementById('btn-lang');
+      
+      // Load saved preferences
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      const savedLang = localStorage.getItem('language') || 'fa';
+      
+      // Apply saved theme
+      if (savedTheme === 'light') {
+        body.classList.add('light-theme');
+      }
+      
+      // Update Telegram WebApp if available
+      const tg = window.Telegram?.WebApp;
+      if (tg && tg.setHeaderColor && tg.setBackgroundColor) {
+        const bgColor = savedTheme === 'light' ? '#f0f4f8' : '#0a0e1a';
+        tg.setHeaderColor(bgColor);
+        tg.setBackgroundColor(bgColor);
+      }
+      
+      // Apply saved language
+      document.documentElement.lang = savedLang;
+      document.documentElement.dir = savedLang === 'fa' ? 'rtl' : 'ltr';
+      updateLanguage(savedLang);
+      
+      // Theme toggle
+      themeBtn?.addEventListener('click', () => {
+        body.classList.toggle('light-theme');
+        const isLight = body.classList.contains('light-theme');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        
+        // Update Telegram WebApp if available
+        const tg = window.Telegram?.WebApp;
+        if (tg && tg.setHeaderColor && tg.setBackgroundColor) {
+          const bgColor = isLight ? '#f0f4f8' : '#0a0e1a';
+          tg.setHeaderColor(bgColor);
+          tg.setBackgroundColor(bgColor);
+        }
+        
+        // Update button text
+        themeBtn.textContent = isLight ? '☀️' : '🌙';
+        themeBtn.title = isLight ? 'Switch to Dark Theme' : 'Switch to Light Theme';
+      });
+      
+      // Language toggle
+      langBtn?.addEventListener('click', () => {
+        const currentLang = document.documentElement.lang;
+        const newLang = currentLang === 'fa' ? 'en' : 'fa';
+        
+        document.documentElement.lang = newLang;
+        document.documentElement.dir = newLang === 'fa' ? 'rtl' : 'ltr';
+        localStorage.setItem('language', newLang);
+        updateLanguage(newLang);
+        
+        // Update Telegram WebApp if available
+        const tg = window.Telegram?.WebApp;
+        if (tg && tg.setHeaderColor && tg.setBackgroundColor) {
+          tg.setHeaderColor('#0a0e1a');
+          tg.setBackgroundColor('#0a0e1a');
+        }
+        
+        // Update button text
+        langBtn.textContent = newLang === 'fa' ? 'EN' : 'FA';
+        langBtn.title = newLang === 'fa' ? 'Switch to English' : 'تغییر به فارسی';
+      });
+      
+      // Update all text elements based on language
+      function updateLanguage(lang) {
+        const elements = document.querySelectorAll('[data-fa][data-en]');
+        elements.forEach(el => {
+          const faText = el.getAttribute('data-fa');
+          const enText = el.getAttribute('data-en');
+          el.textContent = lang === 'fa' ? faText : enText;
+        });
+        
+        // Update other hardcoded elements
+        updateHardcodedText(lang);
+      }
+      
+      // Update hardcoded text elements
+      function updateHardcodedText(lang) {
+        // Update list header
+        const listHeader = document.querySelector('.list-header h2');
+        const listHeaderP = document.querySelector('.list-header p');
+              
+        if (listHeader) {
+          const activeCount = els.activeCount.textContent;
+          listHeader.textContent = lang === 'fa' ? `سرورهای فعال (${activeCount})` : `Active Servers (${activeCount})`;
+        }
+        if (listHeaderP) {
+          listHeaderP.textContent = lang === 'fa' ? 'نتایج به‌صورت دوره‌ای بروزرسانی می‌شود.' : 'Results update periodically.';
+        }
+        
+        // Update status panel
+        const statusTitle = document.querySelector('.status-title');
+        const statusText = document.querySelector('.status-text');
+        
+        if (statusTitle) {
+          statusTitle.textContent = lang === 'fa' ? 'وضعیت اسکن' : 'Scan Status';
+        }
+        
+        // Update scan details
+        const scanDetailsTitle = document.querySelector('.scan-details-title');
+        if (scanDetailsTitle) {
+          scanDetailsTitle.textContent = lang === 'fa' ? 'وضعیت اسکن' : 'Scan Status';
+        }
+        
+        // Update scan info cards
+        const scanInfoCards = document.querySelectorAll('.scan-info-card span');
+        scanInfoCards.forEach(card => {
+          const text = card.textContent;
+          if (text === 'وضعیت') card.textContent = lang === 'fa' ? 'وضعیت' : 'Status';
+          if (text === 'آخرین اسکن') card.textContent = lang === 'fa' ? 'آخرین اسکن' : 'Last Scan';
+          if (text === 'اسکن بعدی') card.textContent = lang === 'fa' ? 'اسکن بعدی' : 'Next Scan';
+          if (text === 'زمان باقی‌مانده') card.textContent = lang === 'fa' ? 'زمان باقی‌مانده' : 'Time Remaining';
+        });
+        
+        // Update mini cards
+        const miniCardSpans = document.querySelectorAll('.mini-card span');
+        miniCardSpans.forEach(span => {
+          const text = span.textContent;
+          if (text === 'کل') span.textContent = lang === 'fa' ? 'کل' : 'Total';
+          if (text === 'فعال') span.textContent = lang === 'fa' ? 'فعال' : 'Active';
+          if (text === 'تست شده') span.textContent = lang === 'fa' ? 'تست شده' : 'Tested';
+        });
+        
+        // Update summary cards
+        const summaryCardSpans = document.querySelectorAll('.summary-card-content span');
+        summaryCardSpans.forEach(span => {
+          const text = span.textContent;
+          if (text === 'آپتایم') span.textContent = lang === 'fa' ? 'آپتایم' : 'Uptime';
+          if (text === 'میانگین پینگ') span.textContent = lang === 'fa' ? 'میانگین پینگ' : 'Avg Ping';
+          if (text === 'سرور فعال') span.textContent = lang === 'fa' ? 'سرور فعال' : 'Active Servers';
+        });
+        
+        // Update button text
+        const copyBtn = document.getElementById('btn-copy-all');
+        const copyBtnSpan = copyBtn?.querySelector('span');
+        if (copyBtn && copyBtnSpan) {
+          const currentText = copyBtn.textContent;
+          if (currentText.includes('کپی همه سرورها') || currentText.includes('Copy All Servers')) {
+            copyBtn.innerHTML = '📋 <span>' + (lang === 'fa' ? 'کپی همه سرورها' : 'Copy All Servers') + '</span>';
+          } else {
+            copyBtn.innerHTML = '📋 <span>' + (lang === 'fa' ? 'کپی همه سرورها' : 'Copy All Servers') + '</span>';
+          }
+        }
+        
+        // Update empty text
+        const emptyText = document.getElementById('empty-text');
+        if (emptyText) {
+          emptyText.innerHTML = lang === 'fa' ? "هیچ سرور فعالی یافت نشد." : "No active servers found.";
+        }
+      }
+    });
   </script>
 </body>
 </html>

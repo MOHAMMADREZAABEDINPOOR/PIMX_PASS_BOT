@@ -9,6 +9,7 @@ import aiosqlite
 from .db import (
     ListedServer,
     get_scan_times,
+    get_stats,
     get_selected_servers_page,
     get_selected_servers_total,
     get_selected_servers_total_with_max_len,
@@ -34,9 +35,10 @@ class DataProvider(Protocol):
 
 
 class DbProvider:
-    def __init__(self, *, dbs: list[aiosqlite.Connection], scanner: Scanner):
+    def __init__(self, *, dbs: list[aiosqlite.Connection], scanner: Scanner, max_latency_ms: int = 250):
         self._dbs = dbs
         self._scanner = scanner
+        self._max_latency_ms = int(max_latency_ms)
         self._idx = 0
 
     async def get_scan_status(self) -> ScanStatus:
@@ -52,11 +54,17 @@ class DbProvider:
             next_scan_at=current.next_scan_at,
         )
         db = self._pick_db()
+        stats = await get_stats(db)
         completed_at, next_at = await get_scan_times(db)
-        if status.scan_completed_at is None:
-            status.scan_completed_at = completed_at
-        if status.next_scan_at is None:
-            status.next_scan_at = next_at
+        if not status.is_scanning:
+            if status.scan_completed_at is None:
+                status.scan_completed_at = stats.get("scan_completed_at") or completed_at
+            if status.next_scan_at is None:
+                status.next_scan_at = stats.get("next_scan_at") or next_at
+            status.total = int(stats.get("total_scanned") or 0)
+            status.tested = int(stats.get("total_scanned") or 0)
+            status.active = int(stats.get("total_active") or 0)
+            status.progress = 100 if status.total else 0
         return status
 
     def _pick_db(self) -> aiosqlite.Connection:
@@ -69,10 +77,15 @@ class DbProvider:
         self, *, page: int, per_page: int, max_config_len: int | None = None
     ) -> PagedServers:
         db = self._pick_db()
+
+        display_max_latency_ms = 99999
+        # Always show the selected servers (max 150) so old scans are not re-displayed.
         if max_config_len is None:
-            total = await get_selected_servers_total(db)
+            total = await get_selected_servers_total(db, max_latency_ms=display_max_latency_ms)
         else:
-            total = await get_selected_servers_total_with_max_len(db, max_config_len=max_config_len)
+            total = await get_selected_servers_total_with_max_len(
+                db, max_config_len=max_config_len, max_latency_ms=display_max_latency_ms
+            )
         if total <= 0:
             return PagedServers(servers=[], total=0)
 
@@ -80,7 +93,11 @@ class DbProvider:
         page = max(0, min(page, max_page))
         offset = page * per_page
         servers = await get_selected_servers_page(
-            db, offset=offset, limit=per_page, max_config_len=max_config_len
+            db,
+            offset=offset,
+            limit=per_page,
+            max_config_len=max_config_len,
+            max_latency_ms=display_max_latency_ms,
         )
         return PagedServers(servers=servers, total=total)
 
@@ -123,6 +140,9 @@ class ApiProvider:
     async def get_servers_page(
         self, *, page: int, per_page: int, max_config_len: int | None = None
     ) -> PagedServers:
+        status = await self.get_scan_status()
+        if int(status.active or 0) <= 0:
+            return PagedServers(servers=[], total=0)
         url = f"{self._base}/servers"
         async with aiohttp.ClientSession() as session:
             async with session.get(url, timeout=15) as resp:

@@ -1,313 +1,93 @@
-# PIMX_PASS_BOT — Server Scanning & Display Bot (Telegram)
+<div align="center">
 
-**An automated, simple, and secure Telegram bot for scanning, testing, and presenting server configurations.**
+# 🤖🔍 PIMX_PASS_BOT ⚡📊
 
-Web UI / Live Demo: local (if configured)
+### Intelligent Server & Proxy Testing Telegram Bot with WebApp Visualization
 
-✨ Key Features
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](https://www.gnu.org/licenses/agpl-3.0)
+[![Python: 3.10+](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Telegram Bot API](https://img.shields.io/badge/Telegram-Bot_API-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://core.telegram.org/bots/api)
+[![SQLite](https://img.shields.io/badge/Database-SQLite3-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![Telegram Mini App](https://img.shields.io/badge/Telegram-Mini_App-0088CC?style=for-the-badge&logo=telegram&logoColor=white)](https://telegram.org/blog/web-apps)
+[![Read in Persian](https://img.shields.io/badge/مطالعه_به_فارسی-Persian_README-008080?style=for-the-badge)](#-توضیحات-فارسی-persian-description)
 
-🔎 Automated Scanning & Testing
-- Scheduled tests (e.g., hourly) with optional concurrent execution
-- Results stored in SQLite with live test status updates
-- Detailed logs and reports for debugging and audit
+<p align="center">
+  A high-performance automated Telegram bot and WebApp engine for parsing, scanning, benchmarking, and publishing proxy and VPN server configurations. Features latency tracking, ping diagnostics, live Telegram inline pagination, and encrypted sharing.
+</p>
 
-📩 Telegram Interaction
-- Paginated server lists (10 items per page)
-- Previous/Next navigation, server search, and manual test/update buttons
-- Live progress/status updates via message edits
-- Optional channel membership enforcement for access control
+[Key Features](#-key-features) •
+[Quick Start](#-quick-start) •
+[توضیحات فارسی](#-توضیحات-فارسی-persian-description) •
+[License](#-license)
 
-🗄️ Storage & Configuration
-- SQLite database for servers and test results (`data/*.db`)
-- Configuration via `.env` (bot token, provider settings, etc.)
-- Pluggable data providers (DB or external services)
+</div>
 
-🌐 Lightweight Web UI
-- Simple web interface for viewing configurations and generating copyable links
-- Useful for sharing long configs without pasting text into chat
+---
 
-🔒 Security Notes
-- **Never store tokens (bot tokens, PATs) inside the repo.** Use `.env` and keep secrets out of source control.
-- If any sensitive value is leaked, revoke/reset it immediately.
+## ⚡ Key Features
 
-🚀 Quick Start
+- 🔎 **Automated Concurrency Testing**: Continuous background health scans for V2Ray, VMess, VLESS, Trojan, and Shadowsocks nodes.
+- 📱 **Telegram Mini App (WebApp)**: Beautiful glassmorphic embedded web interface (`webapp.html`) for interactive visual sorting and config copying.
+- 📩 **Interactive Paginated Menus**: Clean inline keyboard navigation (10 servers per page), search filtering, and one-tap test triggers.
+- 🗄️ **SQLite Persistence Engine**: Persistent storage of historical latency benchmarks, uptime logs, and node status telemetry.
+- 🔒 **Channel Membership Verification**: Optional mandatory Telegram channel subscription enforcement before accessing server endpoints.
 
-1) Create and activate virtual environment:
+---
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\activate
-pip install -r requirements.txt
-```
+## 🚀 Quick Start
 
-2) Configure environment (`.env`):
+### Prerequisites
+- Python 3.10+
+- Telegram Bot Token from [@BotFather](https://t.me/BotFather)
 
-- `TELEGRAM_TOKEN=your_bot_token_here`
-- `DATA_PROVIDER=db`
-- `DATABASE_PATH=data/pimx.db`
-- `WEB_PORT=8080`
-- `PUBLIC_BASE_URL=https://your.domain` (if needed)
-
-3) Run the application:
-
-```powershell
-python main.py
-```
-
-For production use, run the service with systemd, Docker, or a process manager.
-
-🧰 Project Structure
-
-```
-PIMX_PASS_BOT/
-├── main.py
-├── requirements.txt
-├── .env.example
-├── README.md
-├── scripts/                # helper scripts (e.g. push_to_github.ps1)
-├── data/                   # local databases and data files
-└── pimx_bot/
-    ├── config.py
-    ├── db.py
-    ├── scanner.py
-    ├── server_tester.py
-    ├── telegram_app.py
-    └── web_server.py
-```
-
-🛠 Troubleshooting
-- Location or server not found: verify host/port and firewall settings.
-- Tests are not running: check logs (`.log`) and database for errors and exceptions.
-- Bot does not send messages: verify token, network connectivity, and Telegram API limits.
-
-🤝 Contributing
-- Report issues or feature requests via GitHub Issues
-- Fork the repo, create a feature branch, and send a Pull Request with a clear description and tests if applicable
-
-📄 License
-- This project is released under the **MIT License** — free to use, modify and distribute.
-
-👤 Author
-Mohammadreza Abedinpour — https://github.com/MOHAMMADREZAABEDINPOOR
-
-Last updated: 2025
-
-- Advanced City Search: Autocomplete city search with real-time suggestions
-- Multi-City Management: Save up to 20 cities and switch between them seamlessly
-- Persistent Storage: Cities and preferences saved in browser localStorage
-
-🌤️ Comprehensive Weather Data
-Current Conditions
-- Real-time Temperature: Current, feels-like, and daily min/max temperatures
-- Detailed Weather Stats (13 stat cards with animated progress bars):
-  - 🌡️ Feels Like Temperature
-  - 💧 Humidity
-  - 💨 Wind Speed & Direction
-  - 🔽 Atmospheric Pressure
-  - 👁️ Visibility
-  - 💦 Dew Point
-  - 🌧️ Precipitation
-  - ☀️ UV Index
-  - 🏭 Air Quality Index (AQI)
-  - 🌅 Sunrise Time
-  - 🌇 Sunset Time
-  - 🌙 Moon Phase
-
-Forecasts
-- 24-Hour Hourly Forecast: Detailed hour-by-hour predictions with weather icons
-- Extended Daily Forecast: Choose between 7 or 14-day forecasts
-- Visual Weather Icons: Beautiful animated icons for all weather conditions
-- Dynamic Themes: UI automatically adapts to weather conditions (sunny, cloudy, rainy, snowy, night)
-
-📊 Historical Data & Analytics
-Interactive Charts
-- Precipitation History:
-  - View data for past week, month, 6 months, or year
-  - Interactive Chart.js line charts
-  - Statistics: Total precipitation, average max/min, max daily precipitation
-- Temperature History:
-  - Historical temperature trends
-  - Visual temperature charts
-
-☀️🌙 Advanced Astronomy Features
-Sun Arc Visualization 🎨
-- Beautiful Arc Chart: Real-time visualization of sun's path across the sky using Quadratic Bezier Curves
-- Time Markers: Visual markers for 9 AM, 12 PM, 3 PM, and 6 PM
-- Color Gradient: Smooth gradient from sunrise to sunset
-- Glow Effects: Animated glow effects and pulse animations
-- Live Position Tracking: Real-time sun position with altitude angle display
-- Detailed Sun Information:
-  - 🌅 Sunrise Time
-  - 🌇 Sunset Time
-  - ⏱️ Day Length
-  - 🌞 Solar Noon
-  - 📐 Sun Altitude
-  - 🧭 Sun Azimuth
-  - ⬆️ Maximum Altitude
-  - 🌍 Distance from Sun
-
-Moon Arc Visualization 🌙
-- Moon Path Visualization: Beautiful arc chart showing moon's journey across the sky
-- Twinkling Stars: Animated stars in the night sky background
-- Night Visual Effects: Atmospheric night-time visuals
-- Live Moon Tracking: Real-time moon position display
-- Detailed Moon Information:
-  - 🌕 Moon Phase (8 phases with graphical display)
-  - 💡 Illumination Percentage
-  - 📅 Moon Age (days since new moon)
-  - 🌜 Moonrise Time
-  - 🌛 Moonset Time
-  - ⏱️ Duration Above Horizon
-  - 📐 Moon Altitude
-  - 📏 Distance from Earth
-
-Solar System Visualization 🪐
-- Real Astronomical Positions: All 8 planets (Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune) with accurate VSOP87 calculations
-- Interactive Time Control:
-  - Hour slider (00:00 - 23:00) to observe planetary motion throughout the day
-  - "Now" button to jump to current time
-  - Real-time position updates
-- Zoom Controls: Zoom in/out and reset for better viewing (0.5x to 2.0x)
-- Planet Details: Click any planet to see:
-  - Distance from Sun (AU)
-  - 3D Coordinates (X, Y, Z)
-  - Angle and position information
-- Visual Features:
-  - Saturn's rings
-  - Earth's moon
-  - Color-coded planet legend
-- Accuracy: Positions accurate for any date/time (1800-2200 CE)
-
-🎯 User Experience
-Navigation & Controls
-- Day Navigation: Click any day in the forecast to see detailed hourly breakdown
-- Date Selector: Previous/Next day buttons with live date display
-- Live Clock: Real-time local time display for selected city
-- Auto-refresh: Weather data updates automatically
-
-Customization
-- Multi-language Support:
-  - 🇫🇷 Persian (Farsi)
-  - 🇬🇧 English
-  - Auto-detection based on browser/geolocation
-- Temperature Units: Toggle between Celsius (°C) and Fahrenheit (°F)
-- Responsive Zoom: Auto-optimized zoom levels for mobile, tablet, and desktop
-
-Visual Design
-- Beautiful Animations: Weather-specific animations (sun, clouds, rain, snow, night)
-- Loading screen animations
-- Smooth transitions and hover effects
-- Dynamic Color Themes: UI adapts colors based on weather conditions
-- Progress Bar Animations: Animated progress bars for all stat cards
-- SVG Graphics: Custom SVG elements for astronomical visualizations
-
-📱 Responsive Design
-- Mobile-First: Optimized for all screen sizes
-- Breakpoint Support:
-  - Mobile (≤560px)
-  - Tablet (≤880px)
-  - Desktop (>880px)
-- Touch-Friendly: Optimized touch targets and gestures
-- Adaptive Layouts: Grid and Flexbox layouts that adapt to screen size
-
-🚀 Getting Started
-Quick Start
-Clone the repository
-
-git clone https://github.com/MOHAMMADREZAABEDINPOOR/PIMX_WEATHER.git
-cd PIMX_WEATHER
-Open in browser
-
-Simply open index.html in any modern web browser
-No build process or dependencies required!
-Start using
-
-- Allow location access when prompted (optional)
-- Or search for any city worldwide
-
-Browser Requirements
-- Modern Browser: Chrome, Firefox, Safari, Edge (latest versions)
-- JavaScript: Must be enabled
-- Internet Connection: Required for API calls
-
-No Installation Needed!
-This is a pure client-side application:
-
-✅ No server required
-✅ No build process
-✅ No npm/node dependencies (except CDN libraries)
-✅ Works offline for saved cities (after initial load)
-
-🌐 Data Sources & APIs
-Weather APIs
-- Primary: Open-Meteo - Free, accurate, and reliable weather API
-- Forecast API: Real-time and future weather data
-- Archive API: Historical weather data
-- Air Quality API: Air pollution and AQI data
-- Geocoding API: City search and reverse geocoding
-
-Location Services
-- GPS: Native browser geolocation API
-- IP Geolocation: ipapi.co - IP-based location detection
-
-Astronomical Calculations
-- VSOP87: Variations Séculaires des Orbites Planétaires - Planetary position calculations
-- Kepler's Equation: Solving for planetary orbits
-- Julian Day: Astronomical date/time conversion
-- Reference Standards:
-  - JPL Horizons
-  - Astronomical Algorithms by Jean Meeus
-
-## قابلیت‌ها
-
-- دیتابیس SQLite با پسوند `.db`
-- اسکن و تست خودکار سرورها هر ۱ ساعت (در حالت `DATA_PROVIDER=db`)
-- نمایش وضعیت تست (پیشرفت `tested/1000`) با ادیت کردن پیام
-- نمایش لیست سرورها ۱۰ تا ۱۰ تا + دکمه‌های قبلی/بعدی
-- الزام عضویت در کانال قبل از نمایش لیست
-
-## راه‌اندازی
-
-1) پکیج‌ها:
+### Installation
 
 ```bash
-python -m venv .venv
-.\.venv\Scripts\activate
+# 1. Clone the repository
+git clone https://github.com/MOHAMMADREZAABEDINPOOR/PIMX_PASS_BOT.git
+cd PIMX_PASS_BOT
+
+# 2. Setup virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: .\venv\Scripts\activate
 pip install -r requirements.txt
+
+# 3. Configure environment variables
+cp .env.example .env
+# Edit .env with your TELEGRAM_BOT_TOKEN and ADMIN_ID
+
+# 4. Run the bot
+python -m pimx_bot.telegram_app
 ```
 
-2) تنظیمات:
+---
 
-- فایل `.env` بسازید (مثل `.env.example`) و مقادیر را پر کنید.
-- برای چک عضویت، بات باید داخل کانال عضو باشد (ترجیحاً ادمین).
-- برای «کپی با یک کلیک» روی کانفیگ‌های طولانی، `WEB_PORT` و `PUBLIC_BASE_URL` را تنظیم کنید تا بات به‌جای ارسال کانفیگ در چت، لینک کوتاهِ قابل‌کپی بدهد.
+## 🇮🇷 توضیحات فارسی (Persian Description)
 
-3) اجرا:
+### معرفی ربات PIMX_PASS_BOT
+ربات **PIMX_PASS_BOT** یک سیستم خودکار و بسیار هوشمند برای بررسی سلامت، تست سرعت، پینگ و اشتراک‌گذاری کانفیگ‌ها و سرورهای پروکسی در تلگرام است که به همراه یک **مینی‌اپ تلگرام (WebApp)** تعاملی و زیبا طراحی شده است.
 
-```bash
-python main.py
-```
+### امکانات برجسته:
+1. **تست خودکار و لحظه‌ای سرورها:**
+   * اسکن دوره‌ای سرورها و سنجش پینگ و تاخیر اتصال بدون نیاز به دخالت کاربر.
+   * ثبت تاریخچه نتایج تست در دیتابیس محلی SQLite.
+2. **رابط کاربری درون تلگرام و مینی‌اپ:**
+   * مرور کانفیگ‌ها با دکمه‌های شیشه‌ای صفحه‌بندی شده (۱۰ سرور در هر صفحه).
+   * امکان باز کردن مستقیم سرورها در مینی‌اپ با یک کلیک.
+3. **قفل عضویت اجباری در کانال (Force Join):**
+   * قابلیت اتصال به کانال تلگرام شما برای افزایش ممبر پیش از دریافت کانفیگ.
 
-## نکته امنیتی
+---
 
-توکن بات را داخل ریپو نگه ندارید. اگر قبلاً توکن را جایی منتشر کرده‌اید، از BotFather توکن را ریست کنید.
+## 📜 License & Copyright
 
-## بارگذاری به GitHub
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 
-> **قبل از ادامه:** اگر توکن (PAT) را افشا کرده‌اید، فوراً آن را در https://github.com/settings/tokens لغو کنید. از ارسال توکن در چت یا تعبیه آن در کد جداً خودداری کنید.
+> **Copyright (c) 2026 MOHAMMADREZA ABEDINPOOR.**  
+> Public SaaS deployments or bot instances must share their source code under identical AGPL-3.0 terms.
 
-برای ساخت ریپوزیتوری و push امن، دو راه دارید:
+---
 
-1) با GitHub CLI (توصیه‌شده):
-   - نصب: https://cli.github.com/
-   - ورود تعاملی: `gh auth login`
-   - ایجاد و push: `gh repo create PIMX_PASS_BOT --public --source=. --remote=origin --push`
-   - یا از اسکریپت `scripts\push_to_github.ps1` استفاده کنید.
-
-2) با وب و HTTPS یا SSH:
-   - ریپوزیتوری روی GitHub بسازید و سپس:
-     - HTTPS: `git remote add origin https://github.com/<username>/PIMX_PASS_BOT.git` و سپس `git push -u origin main`
-     - SSH: `git remote add origin git@github.com:<username>/PIMX_PASS_BOT.git` و سپس `git push -u origin main`
-
-اگر نیاز دارید، من می‌توانم برای حذف توکن از تاریخچه گیت دستورالعمل‌های امن بدم یا اسکریپت آماده کنم.
-
+<div align="center">
+  <sub>Developed with ❤️ by <a href="https://github.com/MOHAMMADREZAABEDINPOOR">MOHAMMADREZA ABEDINPOOR</a>. Star ⭐ this repo!</sub>
+</div>
