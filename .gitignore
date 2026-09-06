@@ -12,36 +12,5 @@ __pycache__/
 .idea/
 .vscode/
 .DS_Store
-
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Distribution / packaging
-.Python
-build/
-dist/
-.eggs/
-*.egg-info/
-.installed.cfg
-
-# Virtual environments
-.env/
-venv/
-ENV/
-env/
-
-# pyenv
-.python-version
-
-# mypy
-.mypy_cache/
-
-# Test
-.pytest_cache/
-
-data/*.db
-
 *.pem
 data/
