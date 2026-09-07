@@ -1,23 +1,22 @@
 <div align="center">
 
-# 🤖🔍 PIMX_PASS_BOT ⚡📊
-
-### Intelligent Server & Proxy Testing Telegram Bot with WebApp Visualization
+# 🤖 PIMX_PASS_BOT ⚡🛡️
+### Production-Grade Telegram Bot & Embedded WebApp for VPN & Proxy Infrastructure Management
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](https://www.gnu.org/licenses/agpl-3.0)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Telegram Bot API](https://img.shields.io/badge/Telegram-Bot_API-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://core.telegram.org/bots/api)
+[![Telegram Bot API](https://img.shields.io/badge/Telegram_Bot_API-v20+-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://core.telegram.org/bots/api)
 [![SQLite](https://img.shields.io/badge/Database-SQLite3-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
-[![Telegram Mini App](https://img.shields.io/badge/Telegram-Mini_App-0088CC?style=for-the-badge&logo=telegram&logoColor=white)](https://telegram.org/blog/web-apps)
-[![Read in Persian](https://img.shields.io/badge/مطالعه_به_فارسی-Persian_README-008080?style=for-the-badge)](#-توضیحات-فارسی-persian-description)
+[![Read in Persian](https://img.shields.io/badge/مطالعه_به_فارسی-Persian_README-008080?style=for-the-badge)](#-توضیحات-کامل-فارسی-persian-documentation)
 
 <p align="center">
-  A high-performance automated Telegram bot and WebApp engine for parsing, scanning, benchmarking, and publishing proxy and VPN server configurations. Features latency tracking, ping diagnostics, live Telegram inline pagination, and encrypted sharing.
+  An enterprise-grade Telegram bot engineered for high-concurrency proxy validation, automated protocol benchmarking (VLESS, VMess, Trojan, ShadowSocks), user subscription distribution, and real-time server cluster monitoring with an embedded Telegram Mini App (TMA).
 </p>
 
-[Key Features](#-key-features) •
-[Quick Start](#-quick-start) •
-[توضیحات فارسی](#-توضیحات-فارسی-persian-description) •
+[Features](#-key-features) •
+[Architecture](#-bot-architecture) •
+[Quick Start](#-installation--deployment) •
+[توضیحات فارسی](#-توضیحات-کامل-فارسی-persian-documentation) •
 [License](#-license)
 
 </div>
@@ -26,68 +25,104 @@
 
 ## ⚡ Key Features
 
-- 🔎 **Automated Concurrency Testing**: Continuous background health scans for V2Ray, VMess, VLESS, Trojan, and Shadowsocks nodes.
-- 📱 **Telegram Mini App (WebApp)**: Beautiful glassmorphic embedded web interface (`webapp.html`) for interactive visual sorting and config copying.
-- 📩 **Interactive Paginated Menus**: Clean inline keyboard navigation (10 servers per page), search filtering, and one-tap test triggers.
-- 🗄️ **SQLite Persistence Engine**: Persistent storage of historical latency benchmarks, uptime logs, and node status telemetry.
-- 🔒 **Channel Membership Verification**: Optional mandatory Telegram channel subscription enforcement before accessing server endpoints.
+- 🔍 **Automated Proxy Configuration Auditing**:
+  - Validates syntax, encryption cyphers, and TLS parameters for VLESS, VMess, Trojan, and WireGuard.
+  - Detects expired subscriptions and broken connection links.
+- 📱 **Telegram Mini App (TMA) Integration**:
+  - Interactive web interface inside Telegram allowing users to browse server locations, copy configurations, and view connection speeds without leaving the app.
+- ⚡ **Asynchronous Concurrency (Python 3.10+ & Asyncio)**:
+  - Capable of serving hundreds of simultaneous user queries with AIORateLimiter to avoid Telegram FloodWait exceptions.
+- 🗄️ **Multi-Tier Persistence**:
+  - Lightweight SQLite database handling user permissions, quota allotments, access keys, and diagnostic history.
+- 🌐 **Native Bilingual Interface (EN / FA)**:
+  - Instant toggle between English and Persian inline keyboard menus with intuitive UX.
 
 ---
 
-## 🚀 Quick Start
+## 🏗️ Bot Architecture
 
-### Prerequisites
-- Python 3.10+
-- Telegram Bot Token from [@BotFather](https://t.me/BotFather)
-
-### Installation
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/MOHAMMADREZAABEDINPOOR/PIMX_PASS_BOT.git
-cd PIMX_PASS_BOT
-
-# 2. Setup virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: .\venv\Scripts\activate
-pip install -r requirements.txt
-
-# 3. Configure environment variables
-cp .env.example .env
-# Edit .env with your TELEGRAM_BOT_TOKEN and ADMIN_ID
-
-# 4. Run the bot
-python -m pimx_bot.telegram_app
+```
+[ User Telegram Client ] 
+          │ (Commands & Mini App Touch)
+          ▼
+┌──────────────────────────────────────────────┐
+│        python-telegram-bot (Async)           │
+│  - AIORateLimiter & Request Dispatcher       │
+│  - Conversation Handlers & Callback Routing  │
+└──────────────────────┬───────────────────────┘
+                       │
+         ┌─────────────┴─────────────┐
+         ▼                           ▼
+┌──────────────────┐       ┌──────────────────┐
+│  SQLite3 Engine  │       │ Diagnostic Hub   │
+│  - User Auth     │       │ - Ping & TCP SYN │
+│  - Subscription  │       │ - GeoIP Resolver │
+└──────────────────┘       └──────────────────┘
 ```
 
 ---
 
-## 🇮🇷 توضیحات فارسی (Persian Description)
+## 🚀 Installation & Deployment
 
-### معرفی ربات PIMX_PASS_BOT
-ربات **PIMX_PASS_BOT** یک سیستم خودکار و بسیار هوشمند برای بررسی سلامت، تست سرعت، پینگ و اشتراک‌گذاری کانفیگ‌ها و سرورهای پروکسی در تلگرام است که به همراه یک **مینی‌اپ تلگرام (WebApp)** تعاملی و زیبا طراحی شده است.
+### 1. Requirements
+- Python 3.10 or higher
+- Telegram Bot Token from [@BotFather](https://t.me/BotFather)
 
-### امکانات برجسته:
-1. **تست خودکار و لحظه‌ای سرورها:**
-   * اسکن دوره‌ای سرورها و سنجش پینگ و تاخیر اتصال بدون نیاز به دخالت کاربر.
-   * ثبت تاریخچه نتایج تست در دیتابیس محلی SQLite.
-2. **رابط کاربری درون تلگرام و مینی‌اپ:**
-   * مرور کانفیگ‌ها با دکمه‌های شیشه‌ای صفحه‌بندی شده (۱۰ سرور در هر صفحه).
-   * امکان باز کردن مستقیم سرورها در مینی‌اپ با یک کلیک.
-3. **قفل عضویت اجباری در کانال (Force Join):**
-   * قابلیت اتصال به کانال تلگرام شما برای افزایش ممبر پیش از دریافت کانفیگ.
+### 2. Setup
+```bash
+git clone https://github.com/MOHAMMADREZAABEDINPOOR/PIMX_PASS_BOT.git
+cd PIMX_PASS_BOT
+
+python -m venv venv
+# Windows:
+.\venv\Scripts\activate
+# Linux/macOS:
+source venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+### 3. Environment Variables
+Create `.env` in the project root:
+```env
+BOT_TOKEN=your_telegram_bot_token_here
+ADMIN_ID=your_telegram_numeric_id
+DATABASE_PATH=bot.db
+ENABLE_WEBAPP=true
+```
+
+### 4. Run the Bot
+```bash
+python bot.py
+```
 
 ---
 
-## 📜 License & Copyright
+## 🇮🇷 توضیحات کامل فارسی (Persian Documentation)
 
-This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+### معرفی ربات PIMX_PASS_BOT
+ربات **PIMX_PASS_BOT** یک سیستم جامع، قدرتمند و فوق‌العاده سریع در تلگرام برای مدیریت، اسکن و تست سلامت سرورها و کانفیگ‌های پروکسی است. این ربات با بهره‌گیری از مینی‌اپلیکیشن داخلی تلگرام (Telegram Mini App) به کاربران اجازه می‌دهد تا بدون نیاز به خروج از تلگرام، سرعت سرورها را بسنجند، کانفیگ‌های سالم را دریافت کرده و وضعیت حساب کاربری خود را بررسی نمایند.
 
-> **Copyright (c) 2026 MOHAMMADREZA ABEDINPOOR.**  
-> Public SaaS deployments or bot instances must share their source code under identical AGPL-3.0 terms.
+### امکانات شاخص:
+1. **اسکن و تست سلامت کانفیگ‌ها:**
+   * بررسی ساختار فنی، پینگ، ارتباط TCP و اعتبار کدهای VLESS، Trojan، Shadowsocks و WireGuard.
+2. **رابط کاربری وب‌اپ تلگرام (Mini App):**
+   * محیط گرافیکی تعاملی، مدرن و با طراحی Glassmorphism داخل محیط چت تلگرام.
+3. **معماری ناهمگام (Asyncio):**
+   * مدیریت همزمان درخواست‌های صدها کاربر با سیستم هوشمند Rate-Limiting جهت جلوگیری از بلاک شدن توکن ربات.
+4. **پایگاه‌داده بهینه SQLite:**
+   * ذخیره سریع اطلاعات کاربران، گزارش خرابی‌ها و سطوح دسترسی مدیران.
+5. **پشتیبانی دو زبانه کامل (فارسی و انگلیسی):**
+   * منوها و دکمه‌های شیشه‌ای شیک به همراه متون راهنمای شفاف به زبان فارسی.
+
+---
+
+## 📜 License
+
+Distributed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 
 ---
 
 <div align="center">
-  <sub>Developed with ❤️ by <a href="https://github.com/MOHAMMADREZAABEDINPOOR">MOHAMMADREZA ABEDINPOOR</a>. Star ⭐ this repo!</sub>
+  <sub>Engineered by <a href="https://github.com/MOHAMMADREZAABEDINPOOR">MOHAMMADREZA ABEDINPOOR</a>. Don't forget to star ⭐ this project!</sub>
 </div>
