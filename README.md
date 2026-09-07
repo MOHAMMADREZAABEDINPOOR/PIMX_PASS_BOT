@@ -3,13 +3,13 @@
 <!-- ============================================================================== -->
 <!-- DYNAMIC ANIMATED CAPSULE HEADER                                                -->
 <!-- ============================================================================== -->
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=1,12,24,30&height=220&section=header&text=PIMX_PASS_BOT&fontSize=40&fontAlignY=35&desc=%E2%9A%A1%20Production%20Telegram%20Bot%2C%20Mini%20App%20%26%20Proxy%20Scanner&descFontSize=16&descAlignY=62" alt="PIMX_PASS_BOT Banner" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=1,12,24,30&height=220&section=header&text=PIMX_PASS_BOT&fontSize=40&fontAlignY=35&desc=%F0%9F%9B%91%20Archived%20Open-Source%20Proxy%20Scanner%20%26%20Bot%20Reference&descFontSize=16&descAlignY=62" alt="PIMX_PASS_BOT Banner" width="100%" />
 
 <!-- ============================================================================== -->
 <!-- ANIMATED TYPING SVG TELEMETRY                                                 -->
 <!-- ============================================================================== -->
 <a href="https://github.com/MOHAMMADREZAABEDINPOOR/PIMX_PASS_BOT">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=20&duration=2800&pause=1000&color=00D2FF&center=true&vCenter=true&width=780&lines=High-Concurrency+Telegram+Bot+Engine+(Python+3.10%2B+%26+Asyncio);Interactive+Telegram+Mini+App+(TMA)+with+Live+Latency+Pings;Strict+3-Stage+Network+Probe+Verification+Engine;Multi-Protocol+Config+Auditing+(VLESS%2C+VMess%2C+Trojan%2C+SS);Comprehensive+Pytest+Suite+with+21+Automated+Unit+Tests;Async+SQLite3+Persistence+with+Write-Ahead+Logging+(WAL)" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=20&duration=2800&pause=1000&color=00D2FF&center=true&vCenter=true&width=780&lines=Project+Status%3A+Inactive+%2F+Archived+Open-Source+Codebase;High-Concurrency+Telegram+Bot+Engine+(Python+3.10%2B+%26+Asyncio);Interactive+Telegram+Mini+App+(TMA)+with+Live+Latency+Pings;Strict+3-Stage+Network+Probe+Verification+Engine;Multi-Protocol+Config+Auditing+(VLESS%2C+VMess%2C+Trojan%2C+SS);Comprehensive+Pytest+Suite+with+21+Automated+Unit+Tests;Async+SQLite3+Persistence+with+Write-Ahead+Logging+(WAL)" alt="Typing SVG" />
 </a>
 
 <br/>
@@ -17,6 +17,7 @@
 <!-- ============================================================================== -->
 <!-- BADGES MATRIX                                                                  -->
 <!-- ============================================================================== -->
+[![Project Status: Inactive / Archived](https://img.shields.io/badge/Status-Inactive%20%7C%20Archived-critical?style=for-the-badge&logo=archive)](https://github.com/MOHAMMADREZAABEDINPOOR)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge&logo=gnu)](https://www.gnu.org/licenses/agpl-3.0)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Telegram Bot API](https://img.shields.io/badge/Telegram_Bot_API-v20+-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://core.telegram.org/bots/api)
@@ -45,6 +46,12 @@
 </div>
 
 ---
+
+> [!CAUTION]
+> ### 🛑 Project Status: Inactive / Archived (پروژه غیرفعال و بایگانی‌شده)
+> **Notice**: This repository is currently **inactive** and maintained solely as an archived open-source reference / legacy codebase. The bot is not currently running in production, and active infrastructure has been decommissioned.
+>
+> **توجه مهم**: این ریپازیتوری در حال حاضر **کاملاً غیرفعال (Inactive / Archived)** است و صرفاً به عنوان آرشیو سورس‌کد و مرجع متن‌باز نگهداری می‌شود. هیچ ربات یا سرور فعالی بر روی آن در حال اجرا نیست.
 
 ## ⚡ Project Overview & Problem Statement
 
