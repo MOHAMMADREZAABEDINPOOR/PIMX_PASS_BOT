@@ -3,7 +3,7 @@
 <!-- ============================================================================== -->
 <!-- DYNAMIC ANIMATED CAPSULE HEADER                                                -->
 <!-- ============================================================================== -->
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=1,12,24,30&height=220&section=header&text=PIMX_PASS_BOT&fontSize=40&fontAlignY=35&desc=%F0%9F%9B%91%20Archived%20Open-Source%20Proxy%20Scanner%20%26%20Bot%20Reference&descFontSize=16&descAlignY=62" alt="PIMX_PASS_BOT Banner" width="100%" />
+<img src="./assets/banner.svg" alt="PIMX_PASS_BOT 3D Banner" width="100%" />
 
 <!-- ============================================================================== -->
 <!-- ANIMATED TYPING SVG TELEMETRY                                                 -->
@@ -23,7 +23,7 @@
 [![Telegram Bot API](https://img.shields.io/badge/Telegram_Bot_API-v20+-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://core.telegram.org/bots/api)
 [![SQLite](https://img.shields.io/badge/Database-SQLite3_Async-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Pytest](https://img.shields.io/badge/Tests-Pytest_Suite_Passing-brightgreen?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
-[![Read in Persian](https://img.shields.io/badge/مطالعه_به_فارسی-Persian_README-008080?style=for-the-badge)](#-بخش-فوقالعاده-مفصل-و-جامع-به-زبان-فارسی-persian-documentation)
+[![Read in Persian](https://img.shields.io/badge/مطالعه_به_فارسی-Persian_README-008080?style=for-the-badge)](#persian-documentation)
 
 <p align="center">
   <b>PIMX_PASS_BOT</b> is an asynchronous Telegram bot and embedded Telegram Mini App (TMA) engineered for high-concurrency proxy validation, automated protocol benchmarking (VLESS, VMess, Trojan, ShadowSocks, WireGuard), user quota management, and high-speed subscription distribution. Equipped with an authentic 3-stage network probe verification engine, PIMX_PASS_BOT discards dead and packet-dropping nodes before users ever touch them.
@@ -39,7 +39,7 @@
 [Testing Suite](#-automated-pytest-verification-suite) •
 [Installation Guide](#-installation--deployment) •
 [Configuration](#-configuration--environment-variables) •
-[توضیحات فارسی](#-بخش-فوقالعاده-مفصل-و-جامع-به-زبان-فارسی-persian-documentation) •
+[توضیحات فارسی](#persian-documentation) •
 [Roadmap](#-strategic-engineering-roadmap) •
 [License](#-copyleft-license--legal-attribution)
 
@@ -204,7 +204,8 @@ python main.py
 
 ---
 
-## 🇮🇷 بخش فوق‌العاده مفصل و جامع به زبان فارسی (Persian Documentation)
+## Persian Documentation
+### 🇮🇷 مستندات فوق‌العاده مفصل، جامع و فنی به زبان فارسی
 
 ### ۱. مقدمه و چرایی ساخت ربات PIMX_PASS_BOT
 پروژه **PIMX_PASS_BOT** یک ربات هوشمند، پیشرفته و چندنخی در بستر پیام‌رسان تلگرام است که به صورت تخصصی برای اسکن خودکار، اعتبارسنجی کیفیت و توزیع کانفیگ‌های فیلترشکن و پروکسی مهندسی شده است. این ربات مجهز به یک **مینی‌اپلیکیشن اختصاصی تلگرام (Telegram Mini App)** است که به کاربران اجازه می‌دهد بدون نیاز به کپی کردن دستی ده‌ها کانفیگ نامطمئن، پینگ زنده سرورها را درون چت مشاهده کرده و سرورهای سالم را دریافت کنند.
@@ -250,7 +251,7 @@ Under this copyleft covenant, any derivative software, hosted web application, o
 <!-- ============================================================================== -->
 <!-- ANIMATED CAPSULE FOOTER                                                        -->
 <!-- ============================================================================== -->
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=1,12,24,30&height=120&section=footer" alt="Footer" width="100%" />
+<img src="./assets/footer.svg" alt="PIMX_PASS_BOT 3D Footer" width="100%" />
 
 <sub>Architected with dedication by <a href="https://github.com/MOHAMMADREZAABEDINPOOR"><b>MOHAMMADREZA ABEDINPOOR</b></a>. If PIMX_PASS_BOT powers your digital freedom, consider leaving a ⭐!</sub>
 
